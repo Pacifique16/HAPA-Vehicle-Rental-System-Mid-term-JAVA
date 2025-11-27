@@ -152,8 +152,8 @@ public class AdminReportsPanel extends JPanel {
         String path = fc.getSelectedFile().getAbsolutePath();
         if (!path.toLowerCase().endsWith(".pdf")) path += ".pdf";
         try {
-            // PdfExporter.exportTableToPdf(current, title, path);
-            JOptionPane.showMessageDialog(this, "PDF Export temporarily disabled. Install Maven to enable.");
+            PdfExporter.exportTableToPdf(current, title, path);
+            JOptionPane.showMessageDialog(this, "Exported to: " + path);
         } catch (Exception ex){ ex.printStackTrace(); JOptionPane.showMessageDialog(this, "Export failed: " + ex.getMessage()); }
     }
 }

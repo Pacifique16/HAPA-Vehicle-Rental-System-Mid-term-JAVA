@@ -292,9 +292,8 @@ public class LoginForm extends javax.swing.JFrame {
 
     private void lblSignupMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSignupMouseClicked
         // TODO add your handling code here:
-        JOptionPane.showMessageDialog(this, "Signup temporarily disabled");
-        // new SignupForm().setVisible(true);  
-        // this.dispose();
+        new SignupForm().setVisible(true);  
+        this.dispose();
 
     }//GEN-LAST:event_lblSignupMouseClicked
 
