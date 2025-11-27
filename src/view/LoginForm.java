@@ -277,7 +277,7 @@ public class LoginForm extends javax.swing.JFrame {
         // Redirect based on role
         if (user.getRole().equals("admin")) {
             JOptionPane.showMessageDialog(this, "Welcome Admin " + user.getFullName() + "!");
-            new AdminDashboard().setVisible(true);
+            new AdminDashboard(user).setVisible(true);
             this.dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Welcome " + user.getFullName() + "!");
