@@ -343,7 +343,7 @@ public class BookingDAOImpl implements BookingDAO {
 
     @Override
     public int countTotalRentals() {
-        String sql = "SELECT COUNT(*) FROM bookings";
+        String sql = "SELECT COUNT(*) FROM bookings WHERE status != 'REJECTED'";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement pst = con.prepareStatement(sql);
