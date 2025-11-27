@@ -22,6 +22,7 @@ public class Vehicle {
     private String fuelType;
     private String transmission;
     private int seats;
+    private String status;
 
     
     public Vehicle() {}
@@ -107,6 +108,14 @@ public class Vehicle {
 
     public void setSeats(int seats) {
         this.seats = seats;
+    }
+    
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

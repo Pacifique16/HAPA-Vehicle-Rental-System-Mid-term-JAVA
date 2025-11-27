@@ -79,7 +79,10 @@ public class BookVehiclePanel extends JPanel {
         panelVehicles.removeAll();
 
         for (Vehicle v : vehicles) {
-            panelVehicles.add(createVehicleCard(v));
+            // Only show vehicles that are not in maintenance
+            if (!"Maintenance".equals(v.getStatus())) {
+                panelVehicles.add(createVehicleCard(v));
+            }
         }
 
         SwingUtilities.invokeLater(() -> {

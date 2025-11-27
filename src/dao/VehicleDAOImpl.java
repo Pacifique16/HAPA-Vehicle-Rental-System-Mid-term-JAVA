@@ -38,6 +38,7 @@ public class VehicleDAOImpl implements VehicleDAO {
                 v.setFuelType(rs.getString("fuel_type"));
                 v.setTransmission(rs.getString("transmission"));
                 v.setSeats(rs.getInt("seats"));
+                v.setStatus(rs.getString("status"));
 
                 list.add(v);
             }
@@ -233,7 +234,8 @@ public class VehicleDAOImpl implements VehicleDAO {
     public int countAvailableToday() {
         String sql =
             "SELECT COUNT(*) FROM vehicles v " +
-            "WHERE v.id NOT IN ( " +
+            "WHERE v.status != 'Maintenance' " +
+            "AND v.id NOT IN ( " +
             "   SELECT vehicle_id FROM bookings " +
             "   WHERE status NOT IN ('CANCELLED', 'REJECTED', 'EXPIRED') " +
             "   AND CURRENT_DATE BETWEEN start_date AND end_date " +
@@ -249,6 +251,37 @@ public class VehicleDAOImpl implements VehicleDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+    
+    @Override
+    public boolean updateVehicleStatus(int vehicleId, String status) {
+        String sql = "UPDATE vehicles SET status = ? WHERE id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, status);
+            pst.setInt(2, vehicleId);
+            return pst.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean isVehicleAvailableForBooking(int vehicleId) {
+        String sql = "SELECT status FROM vehicles WHERE id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setInt(1, vehicleId);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                String status = rs.getString("status");
+                return !"Maintenance".equals(status);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     

@@ -29,5 +29,9 @@ public interface VehicleDAO {
     public boolean addVehicle(Vehicle vehicle);
     
     public boolean updateVehicle(Vehicle vehicle);
+    
+    public boolean updateVehicleStatus(int vehicleId, String status);
+    
+    public boolean isVehicleAvailableForBooking(int vehicleId);
 }
 
