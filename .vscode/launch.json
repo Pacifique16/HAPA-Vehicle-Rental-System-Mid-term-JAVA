@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch LoginForm",
+            "request": "launch",
+            "mainClass": "view.LoginForm",
+            "classPaths": [
+                "${workspaceFolder}/target/classes",
+                "${workspaceFolder}/lib/*"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}

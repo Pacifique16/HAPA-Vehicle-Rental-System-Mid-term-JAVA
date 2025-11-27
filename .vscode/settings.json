@@ -1,0 +1,18 @@
+{
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-23",
+            "path": "C:\\Users\\Pacifique Harerimana\\.jdks\\openjdk-23.0.2"
+        }
+    ],
+    "java.jdt.ls.java.home": "C:\\Users\\Pacifique Harerimana\\.jdks\\openjdk-23.0.2",
+    "java.home": "C:\\Users\\Pacifique Harerimana\\.jdks\\openjdk-23.0.2",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.project.sourcePaths": ["src"],
+    "java.project.outputPath": "target/classes",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar"
+    ],
+    "java.debug.settings.onBuildFailureProceed": true
+}
