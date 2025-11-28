@@ -27,6 +27,7 @@ public class AdminDashboard extends javax.swing.JFrame {
     
     public AdminDashboard(User user) {
         initComponents();
+        this.setSize(1400, 700);
         this.setLocationRelativeTo(null);
         this.loggedInUser = user;
         
@@ -246,7 +247,7 @@ public class AdminDashboard extends javax.swing.JFrame {
                 .addComponent(panelContent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        pack();
+        setResizable(true);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnDashboardActionPerformed(java.awt.event.ActionEvent evt) {

@@ -30,12 +30,10 @@ public class CustomerDashboard extends javax.swing.JFrame {
         setIconImage(new ImageIcon("images/logo.png").getImage());
         initComponents();
         this.loggedInUser = user;
+        this.setSize(1400, 700);
         this.setLocationRelativeTo(null);
 
-        panelContent.setPreferredSize(new Dimension(900, 600));  // <-- ADD THIS
-
         panelContent.setLayout(new java.awt.BorderLayout());
-        panelContent.setMinimumSize(new Dimension(900, 600));
 
         showPage(new BookVehiclePanel(loggedInUser));
         
@@ -237,7 +235,7 @@ public class CustomerDashboard extends javax.swing.JFrame {
                 .addComponent(panelContent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        pack();
+        setResizable(true);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBookVehicleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBookVehicleActionPerformed
