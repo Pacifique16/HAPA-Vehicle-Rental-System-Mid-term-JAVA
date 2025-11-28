@@ -281,8 +281,12 @@ public class LoginForm extends javax.swing.JFrame {
                 new CustomerDashboard(user).setVisible(true);
                 this.dispose();
             } else {
-                // Role mismatch
-                JOptionPane.showMessageDialog(this, "Invalid role selection!", "Error", JOptionPane.ERROR_MESSAGE);
+                // Role mismatch - provide specific message
+                if (isStaff && user.getRole().equals("customer")) {
+                    JOptionPane.showMessageDialog(this, "You're not registered as staff", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Invalid role selection!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         } else {
             JOptionPane.showMessageDialog(this, "Invalid username or password!", "Error", JOptionPane.ERROR_MESSAGE);

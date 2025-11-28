@@ -160,9 +160,18 @@ public class BookVehiclePanel extends JPanel {
         JPanel iconRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 3));
         iconRow.setBackground(Color.WHITE);
 
-        JLabel lblFuel = new JLabel("⛽ " + v.getFuelType());
-        JLabel lblTrans = new JLabel("⚙️ " + v.getTransmission());
-        JLabel lblSeats = new JLabel("👥 " + v.getSeats());
+        // Load icons and create labels with icons
+        ImageIcon fuelIcon = new ImageIcon(new ImageIcon("images/fuel.png").getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH));
+        ImageIcon gearIcon = new ImageIcon(new ImageIcon("images/gear.png").getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH));
+        ImageIcon seatIcon = new ImageIcon(new ImageIcon("images/seat.png").getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH));
+        
+        JLabel lblFuel = new JLabel(v.getFuelType(), fuelIcon, JLabel.LEFT);
+        JLabel lblTrans = new JLabel(v.getTransmission(), gearIcon, JLabel.LEFT);
+        JLabel lblSeats = new JLabel(String.valueOf(v.getSeats()), seatIcon, JLabel.LEFT);
+        
+        lblFuel.setIconTextGap(5);
+        lblTrans.setIconTextGap(5);
+        lblSeats.setIconTextGap(5);
 
         lblFuel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblTrans.setFont(new Font("Segoe UI", Font.PLAIN, 12));

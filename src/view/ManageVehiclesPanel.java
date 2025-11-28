@@ -62,9 +62,6 @@ public class ManageVehiclesPanel extends JPanel {
         tfSearch.setToolTipText("Search plate, model, category, fuel, transmission, status, seats, price...");
         tfSearch.addActionListener(e -> doSearch());
 
-        JButton bSearch = new JButton("Search");
-        bSearch.addActionListener(e -> doSearch());
-        
         // Filter components
         categoryFilter = new JComboBox<>(new String[]{"All Categories", "SUV", "Sedan", "Hatchback", "Truck", "Van"});
         statusFilter = new JComboBox<>(new String[]{"All Status", "Available", "Rented", "Maintenance"});
@@ -74,7 +71,6 @@ public class ManageVehiclesPanel extends JPanel {
 
         searchPanel.add(new JLabel("Search:"));
         searchPanel.add(tfSearch);
-        searchPanel.add(bSearch);
         searchPanel.add(Box.createHorizontalStrut(10));
         searchPanel.add(new JLabel("Category:"));
         searchPanel.add(categoryFilter);
