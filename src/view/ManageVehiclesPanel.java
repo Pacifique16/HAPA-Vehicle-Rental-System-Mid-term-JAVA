@@ -247,28 +247,39 @@ public class ManageVehiclesPanel extends JPanel {
             super((Frame) SwingUtilities.getWindowAncestor(ManageVehiclesPanel.this), true);
             this.editing = v;
             setTitle(v==null? "Add Vehicle" : "Edit Vehicle");
-            setSize(480,420);
+            setSize(550,450);
             setLayout(new BorderLayout(8,8));
             JPanel p = new JPanel(new GridBagLayout());
             p.setBorder(BorderFactory.createEmptyBorder(12,12,12,12));
             GridBagConstraints c = new GridBagConstraints(); c.insets = new Insets(6,6,6,6); c.anchor = GridBagConstraints.WEST;
 
             // Initialize components with validation
-            tfPlate = new JTextField(v==null?"":v.getPlateNumber(),18);
-            tfModel = new JTextField(v==null?"":v.getModel(),18);
+            tfPlate = new JTextField(v==null?"":v.getPlateNumber());
+            tfPlate.setPreferredSize(new java.awt.Dimension(200, 25));
+            
+            tfModel = new JTextField(v==null?"":v.getModel());
+            tfModel.setPreferredSize(new java.awt.Dimension(200, 25));
             
             cbCategory = new JComboBox<>(new String[]{"SUV", "Sedan", "Hatchback", "Truck", "Van", "Coupe"});
+            cbCategory.setPreferredSize(new java.awt.Dimension(200, 25));
             if (v != null) cbCategory.setSelectedItem(v.getCategory());
             
             cbFuelType = new JComboBox<>(new String[]{"Petrol", "Diesel", "Electric", "Hybrid"});
+            cbFuelType.setPreferredSize(new java.awt.Dimension(200, 25));
             if (v != null && v.getFuelType() != null) cbFuelType.setSelectedItem(v.getFuelType());
             
             cbTransmission = new JComboBox<>(new String[]{"Manual", "Automatic", "CVT"});
+            cbTransmission.setPreferredSize(new java.awt.Dimension(200, 25));
             if (v != null && v.getTransmission() != null) cbTransmission.setSelectedItem(v.getTransmission());
             
-            tfPrice = new JTextField(v==null? "0": String.valueOf((long)v.getPricePerDay()),12);
-            tfSeats = new JTextField(v==null? "4": String.valueOf(v.getSeats()),4);
-            tfImagePath = new JTextField(v==null?"":v.getImagePath(),18);
+            tfPrice = new JTextField(v==null? "0": String.valueOf((long)v.getPricePerDay()));
+            tfPrice.setPreferredSize(new java.awt.Dimension(200, 25));
+            
+            tfSeats = new JTextField(v==null? "4": String.valueOf(v.getSeats()));
+            tfSeats.setPreferredSize(new java.awt.Dimension(200, 25));
+            
+            tfImagePath = new JTextField(v==null?"":v.getImagePath());
+            tfImagePath.setPreferredSize(new java.awt.Dimension(200, 25));
             
             btnBrowseImage = new JButton("Browse");
             btnBrowseImage.addActionListener(e -> browseImage());
@@ -283,7 +294,9 @@ public class ManageVehiclesPanel extends JPanel {
             c.gridx=0; c.gridy=6; p.add(new JLabel("Seats:"), c); c.gridx=1; p.add(tfSeats, c);
             c.gridx=0; c.gridy=7; p.add(new JLabel("Image:"), c); 
             JPanel imgPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-            imgPanel.add(tfImagePath); imgPanel.add(btnBrowseImage);
+            imgPanel.add(tfImagePath); 
+            imgPanel.add(Box.createHorizontalStrut(5));
+            imgPanel.add(btnBrowseImage);
             c.gridx=1; p.add(imgPanel, c);
 
             add(p, BorderLayout.CENTER);

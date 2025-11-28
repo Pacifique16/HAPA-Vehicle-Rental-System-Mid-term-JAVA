@@ -32,5 +32,7 @@ public interface UserDAO {
 
     public List<User> getAllUsers();
     
+    boolean updateUserStatus(int userId, String status);
+    
 }
 

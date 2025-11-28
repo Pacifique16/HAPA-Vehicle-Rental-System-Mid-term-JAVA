@@ -558,7 +558,11 @@ public class MyBookingsPanel extends JPanel {
         long days = Math.max(1L, (b.getEndDate().getTime() - b.getStartDate().getTime())/(1000L*60*60*24) + 1);
         lblDays.setText("Days: " + days);
         lblTotal.setText("Total: " + String.format("%,.0f RWF", b.getTotalCost()));
-        lblStatus.setText("Status: " + b.getStatus());
+        if ("REJECTED".equals(b.getStatus()) && b.getRejectionReason() != null && !b.getRejectionReason().trim().isEmpty()) {
+            lblStatus.setText("Reason: " + b.getRejectionReason());
+        } else {
+            lblStatus.setText("");
+        }
 
         try {
             ImageIcon ic = new ImageIcon(v.getImagePath());

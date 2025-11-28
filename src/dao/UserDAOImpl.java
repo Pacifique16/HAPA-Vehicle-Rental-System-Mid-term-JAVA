@@ -49,7 +49,15 @@ public class UserDAOImpl implements UserDAO {
                 u.setPhone(rs.getString("phone"));
                 u.setEmail(rs.getString("email"));
                 u.setRole(rs.getString("role"));
+                u.setStatus(rs.getString("status"));
                 System.out.println("User role: " + u.getRole());
+                
+                // Check if user is active
+                if ("Inactive".equals(u.getStatus())) {
+                    System.out.println("User account is inactive");
+                    return null; // Prevent login for inactive users
+                }
+                
                 return u;
             } else {
                 System.out.println("No user found with these credentials");
@@ -66,7 +74,7 @@ public class UserDAOImpl implements UserDAO {
     
     @Override
 public boolean addUser(User user) {
-    String sql = "INSERT INTO users (username, password, full_name, phone, email, role) VALUES (?, ?, ?, ?, ?, ?)";
+    String sql = "INSERT INTO users (username, password, full_name, phone, email, role, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     try (Connection con = DBConnection.getConnection();
          PreparedStatement pst = con.prepareStatement(sql)) {
@@ -77,6 +85,7 @@ public boolean addUser(User user) {
         pst.setString(4, user.getPhone());
         pst.setString(5, user.getEmail());
         pst.setString(6, user.getRole());
+        pst.setString(7, user.getStatus() != null ? user.getStatus() : "Active");
 
         return pst.executeUpdate() > 0;
 
@@ -147,6 +156,7 @@ public List<User> getAllUsers() {
             u.setPhone(rs.getString("phone"));
             u.setEmail(rs.getString("email"));
             u.setRole(rs.getString("role"));
+            u.setStatus(rs.getString("status"));
 
             list.add(u);
         }
@@ -175,18 +185,92 @@ public List<User> getAllUsers() {
 
     @Override
     public boolean deleteUser(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String sql = "DELETE FROM users WHERE id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setInt(1, id);
+            return pst.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
-    public boolean updateUser(User uu) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean updateUser(User user) {
+        String sql = "UPDATE users SET username = ?, full_name = ?, phone = ?, email = ?, role = ?, status = ?";
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            sql += ", password = ?";
+        }
+        sql += " WHERE id = ?";
+        
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            
+            pst.setString(1, user.getUsername());
+            pst.setString(2, user.getFullName());
+            pst.setString(3, user.getPhone());
+            pst.setString(4, user.getEmail());
+            pst.setString(5, user.getRole());
+            pst.setString(6, user.getStatus() != null ? user.getStatus() : "Active");
+            
+            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+                pst.setString(7, user.getPassword());
+                pst.setInt(8, user.getId());
+            } else {
+                pst.setInt(7, user.getId());
+            }
+            
+            return pst.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public User findById(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String sql = "SELECT * FROM users WHERE id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            
+            pst.setInt(1, id);
+            ResultSet rs = pst.executeQuery();
+            
+            if (rs.next()) {
+                User u = new User();
+                u.setId(rs.getInt("id"));
+                u.setUsername(rs.getString("username"));
+                u.setPassword(rs.getString("password"));
+                u.setFullName(rs.getString("full_name"));
+                u.setPhone(rs.getString("phone"));
+                u.setEmail(rs.getString("email"));
+                u.setRole(rs.getString("role"));
+                u.setStatus(rs.getString("status"));
+                return u;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
-
+    
+    public User authenticateUser(String username, String password) {
+        return login(username, password);
+    }
+    
+    @Override
+    public boolean updateUserStatus(int userId, String status) {
+        String sql = "UPDATE users SET status = ? WHERE id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, status);
+            pst.setInt(2, userId);
+            return pst.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 }

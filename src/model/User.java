@@ -20,6 +20,7 @@ public class User {
     private String phone;
     private String email;
     private String role; // admin or customer
+    private String status; // Active or Inactive
 
     public User() {}
 
@@ -89,5 +90,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+    
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

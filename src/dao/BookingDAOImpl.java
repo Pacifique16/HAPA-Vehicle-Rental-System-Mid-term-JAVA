@@ -63,7 +63,7 @@ public class BookingDAOImpl implements BookingDAO {
                                                         int limit, int offset) {
         List<BookingRecord> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT b.id AS b_id, b.customer_id, b.vehicle_id, b.start_date, b.end_date, b.total_cost, b.status, ")
+        sql.append("SELECT b.id AS b_id, b.customer_id, b.vehicle_id, b.start_date, b.end_date, b.total_cost, b.status, b.rejection_reason, ")
            .append("v.id AS v_id, v.plate_number, v.model, v.category, v.price_per_day, v.image_path, v.fuel_type, v.transmission, v.seats ")
            .append("FROM bookings b JOIN vehicles v ON b.vehicle_id = v.id WHERE b.customer_id = ? ");
 
@@ -123,6 +123,7 @@ public class BookingDAOImpl implements BookingDAO {
                     b.setEndDate(rs.getDate("end_date"));
                     b.setTotalCost(rs.getDouble("total_cost"));
                     b.setStatus(rs.getString("status"));
+                    b.setRejectionReason(rs.getString("rejection_reason"));
 
                     Vehicle v = new Vehicle();
                     v.setId(rs.getInt("v_id"));
@@ -397,17 +398,57 @@ public class BookingDAOImpl implements BookingDAO {
 
     @Override
     public User getCustomerForBooking(int customerId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String sql = "SELECT * FROM users WHERE id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setInt(1, customerId);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                User u = new User();
+                u.setId(rs.getInt("id"));
+                u.setFullName(rs.getString("full_name"));
+                u.setPhone(rs.getString("phone"));
+                u.setEmail(rs.getString("email"));
+                u.setUsername(rs.getString("username"));
+                u.setRole(rs.getString("role"));
+                return u;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
     public boolean approveBooking(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String sql = "UPDATE bookings SET status = 'APPROVED' WHERE id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setInt(1, id);
+            return pst.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public boolean rejectBooking(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return rejectBookingWithReason(id, null);
+    }
+    
+    @Override
+    public boolean rejectBookingWithReason(int id, String reason) {
+        String sql = "UPDATE bookings SET status = 'REJECTED', rejection_reason = ? WHERE id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, reason);
+            pst.setInt(2, id);
+            return pst.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
@@ -480,7 +521,43 @@ public class BookingDAOImpl implements BookingDAO {
 
     @Override
     public List<BookingRecord> getPendingBookings() {
-        throw new UnsupportedOperationException("getPendingBookings() not implemented yet.");
+        List<BookingRecord> list = new ArrayList<>();
+        String sql = "SELECT b.id AS b_id, b.customer_id, b.vehicle_id, b.start_date, b.end_date, b.total_cost, b.status, " +
+                     "v.id AS v_id, v.plate_number, v.model, v.category, v.price_per_day, v.image_path, v.fuel_type, v.transmission, v.seats " +
+                     "FROM bookings b JOIN vehicles v ON b.vehicle_id = v.id " +
+                     "WHERE b.status = 'PENDING' ORDER BY b.start_date ASC";
+        
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            
+            while (rs.next()) {
+                Booking b = new Booking();
+                b.setId(rs.getInt("b_id"));
+                b.setCustomerId(rs.getInt("customer_id"));
+                b.setVehicleId(rs.getInt("vehicle_id"));
+                b.setStartDate(rs.getDate("start_date"));
+                b.setEndDate(rs.getDate("end_date"));
+                b.setTotalCost(rs.getDouble("total_cost"));
+                b.setStatus(rs.getString("status"));
+                
+                Vehicle v = new Vehicle();
+                v.setId(rs.getInt("v_id"));
+                v.setPlateNumber(rs.getString("plate_number"));
+                v.setModel(rs.getString("model"));
+                v.setCategory(rs.getString("category"));
+                v.setPricePerDay(rs.getDouble("price_per_day"));
+                v.setImagePath(rs.getString("image_path"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setTransmission(rs.getString("transmission"));
+                v.setSeats(rs.getInt("seats"));
+                
+                list.add(new BookingRecord(b, v));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
 

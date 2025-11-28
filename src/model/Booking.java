@@ -20,6 +20,7 @@ public class Booking {
     private Date endDate;
     private double totalCost;
     private String status;
+    private String rejectionReason;
 
     public Booking() {}
 
@@ -44,4 +45,7 @@ public class Booking {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    
+    public String getRejectionReason() { return rejectionReason; }
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
 }

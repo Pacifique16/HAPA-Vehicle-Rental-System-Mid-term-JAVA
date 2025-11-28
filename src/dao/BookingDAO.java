@@ -56,6 +56,8 @@ public interface BookingDAO {
     public boolean approveBooking(int id);
 
     public boolean rejectBooking(int id);
+    
+    public boolean rejectBookingWithReason(int id, String reason);
 
     public List<BookingRecord> getActiveRentals();
 
