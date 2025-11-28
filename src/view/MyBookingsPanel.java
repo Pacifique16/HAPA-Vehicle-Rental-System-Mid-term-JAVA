@@ -63,6 +63,9 @@ public class MyBookingsPanel extends JPanel {
     private int totalPages = 1;
     private JLabel lblPageInfo;
     private JPanel paginationPanel;
+    
+    // Store current search results for row selection
+    private List<BookingRecord> currentSearchResults = new java.util.ArrayList<>();
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -113,7 +116,7 @@ public class MyBookingsPanel extends JPanel {
         tfModel = new JTextField();
         tfModel.setColumns(14);
         styleRounded(tfModel);
-        tfModel.setToolTipText("Search by vehicle model");
+        tfModel.setToolTipText("Search by vehicle model, plate, status, dates, total cost...");
         pSearch.add(searchIcon, BorderLayout.WEST);
         pSearch.add(tfModel, BorderLayout.CENTER);
 
@@ -435,12 +438,28 @@ public class MyBookingsPanel extends JPanel {
             // 🚀 Past filter activated → only show EXPIRED
             status = "EXPIRED";
         }
-        int totalRows = bookingDAO.countFilteredBookings(user.getId(), modelLike, from, to, status);
+        // Get all filtered records first
+        List<BookingRecord> allFiltered = bookingDAO.getFilteredBookings(user.getId(), "", from, to, status);
+        
+        // Apply search filter across all criteria
+        String searchQuery = tfModel.getText().trim().toLowerCase();
+        currentSearchResults = new java.util.ArrayList<>();
+        for (BookingRecord rec : allFiltered) {
+            if (searchQuery.isEmpty() || matchesSearch(rec, searchQuery)) {
+                currentSearchResults.add(rec);
+            }
+        }
+        
+        // Calculate pagination from search results
+        int totalRows = currentSearchResults.size();
         totalPages = Math.max(1, (int)Math.ceil(totalRows / (double) pageSize));
         if (currentPage > totalPages) currentPage = totalPages;
 
         int offset = (currentPage - 1) * pageSize;
-        List<BookingRecord> page = bookingDAO.getFilteredBookingsPaged(user.getId(), modelLike, from, to, status, pageSize, offset);
+        List<BookingRecord> page = new java.util.ArrayList<>();
+        for (int i = offset; i < Math.min(offset + pageSize, currentSearchResults.size()); i++) {
+            page.add(currentSearchResults.get(i));
+        }
 
         tableModel.setRowCount(0);
         for (BookingRecord rec : page) {
@@ -527,9 +546,8 @@ public class MyBookingsPanel extends JPanel {
         int modelIndex = table.convertRowIndexToModel(sel);
         int bookingId = Integer.parseInt(tableModel.getValueAt(modelIndex, 0).toString());
 
-        List<BookingRecord> list = bookingDAO.getFilteredBookings(user.getId(), tfModel.getText().trim(), getFilterFrom(), getFilterTo(), (String)cbStatus.getSelectedItem());
         BookingRecord rec = null;
-        for (BookingRecord r : list) if (r.getBooking().getId() == bookingId) { rec = r; break; }
+        for (BookingRecord r : currentSearchResults) if (r.getBooking().getId() == bookingId) { rec = r; break; }
         if (rec == null) { clearPreview(); return; }
 
         Booking b = rec.getBooking();
@@ -721,6 +739,19 @@ public class MyBookingsPanel extends JPanel {
         String out = s.replace("\"", "\"\"");
         if (out.contains(",") || out.contains("\"") || out.contains("\n")) return "\"" + out + "\"";
         return out;
+    }
+    
+    private boolean matchesSearch(BookingRecord rec, String query) {
+        Booking b = rec.getBooking();
+        Vehicle v = rec.getVehicle();
+        
+        return (v.getModel() != null && v.getModel().toLowerCase().contains(query)) ||
+               (v.getPlateNumber() != null && v.getPlateNumber().toLowerCase().contains(query)) ||
+               (v.getCategory() != null && v.getCategory().toLowerCase().contains(query)) ||
+               (b.getStatus() != null && b.getStatus().toLowerCase().contains(query)) ||
+               (sdf.format(b.getStartDate()).contains(query)) ||
+               (sdf.format(b.getEndDate()).contains(query)) ||
+               String.valueOf((int)b.getTotalCost()).contains(query);
     }
 
     /**
