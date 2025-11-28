@@ -86,7 +86,7 @@ public class LoginForm extends javax.swing.JFrame {
     
     public LoginForm() {
         initComponents();
-        this.setLocationRelativeTo(null);
+
         setIconImage(new ImageIcon("images/logo.png").getImage());
 
         // ---- FIX IMAGE LABEL (override auto-generated values) ----
@@ -130,6 +130,7 @@ public class LoginForm extends javax.swing.JFrame {
         lblSignup = new javax.swing.JLabel();
         imageLabel = new javax.swing.JLabel();
 
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel1.setFont(new java.awt.Font("Perpetua", 0, 18)); // NOI18N
@@ -217,95 +218,117 @@ public class LoginForm extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(53, 53, 53)
+                .addGap(34, 34, 34)
                 .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel1)
                 .addGap(18, 18, 18)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
-                .addGap(13, 13, 13)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addGap(18, 18, 18)
-                .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(chkStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkStaff)
                 .addGap(18, 18, 18)
                 .addComponent(btnLogin)
-                .addGap(31, 31, 31)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(lblSignup))
-                .addGap(42, 42, 42))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
-
-
-    
-    
-    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        // TODO add your handling code here:
-        String username = txtUsername.getText().trim();
-        String password = new String(txtPassword.getPassword());
-        if (username.equals("                   Enter Username")) username = "";
-        if (password.equals("                   Enter Password")) password = "";
-        boolean staffSelected = chkStaff.isSelected();
-
-        // Input validation
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill all fields!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        User user = userDAO.login(username, password);
-
-        if (user == null) {
-            JOptionPane.showMessageDialog(this, "Invalid username or password!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Role validation
-        if (staffSelected && !user.getRole().equals("admin")) {
-            JOptionPane.showMessageDialog(this, "You are NOT registered as staff!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Redirect based on role
-        if (user.getRole().equals("admin")) {
-            JOptionPane.showMessageDialog(this, "Welcome Admin " + user.getFullName() + "!");
-            new AdminDashboard(user).setVisible(true);
-            this.dispose();
-        } else {
-            JOptionPane.showMessageDialog(this, "Welcome " + user.getFullName() + "!");
-            new CustomerDashboard(user).setVisible(true);
-            this.dispose();
-        }
-    }//GEN-LAST:event_btnLoginActionPerformed
 
     private void chkStaffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkStaffActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkStaffActionPerformed
 
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+        // TODO add your handling code here:
+        
+        String username = txtUsername.getText().trim();
+        String password = new String(txtPassword.getPassword());
+        boolean isStaff = chkStaff.isSelected();
+        
+        // Remove placeholder fake values
+        if (username.equals("   Enter Username")) username = "";
+        if (password.equals("    Enter Password")) password = "";
+        
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Authenticate user
+        User user = userDAO.login(username, password);
+        
+        if (user != null) {
+            // Check role match
+            if (isStaff && user.getRole().equals("admin")) {
+                // Staff login successful
+                JOptionPane.showMessageDialog(this, "Welcome Admin: " + user.getFullName());
+                new AdminDashboard(user).setVisible(true);
+                this.dispose();
+            } else if (!isStaff && user.getRole().equals("customer")) {
+                // Customer login successful
+                JOptionPane.showMessageDialog(this, "Welcome Customer: " + user.getFullName());
+                new CustomerDashboard(user).setVisible(true);
+                this.dispose();
+            } else {
+                // Role mismatch
+                JOptionPane.showMessageDialog(this, "Invalid role selection!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid username or password!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnLoginActionPerformed
+
     private void lblSignupMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSignupMouseClicked
         // TODO add your handling code here:
-        new SignupForm().setVisible(true);  
+        new SignupForm().setVisible(true);
         this.dispose();
-
     }//GEN-LAST:event_lblSignupMouseClicked
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        
-                new LoginForm().setVisible(true);
-            
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
- 
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new LoginForm().setVisible(true);
+            }
+        });
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogin;
