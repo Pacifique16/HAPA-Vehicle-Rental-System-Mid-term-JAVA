@@ -41,10 +41,11 @@ public class BookVehiclePanel extends JPanel {
 
     private void initComponents() {
         setLayout(new BorderLayout());
+        setBackground(new Color(222, 235, 247));
 
         panelVehicles = new JPanel();
         panelVehicles.setLayout(new WrapLayout(FlowLayout.LEFT, 20, 20));
-        panelVehicles.setBackground(Color.WHITE);
+        panelVehicles.setBackground(new Color(222, 235, 247));
 
         scrollPanel = new JScrollPane(panelVehicles);
         scrollPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -101,10 +102,7 @@ public class BookVehiclePanel extends JPanel {
         card.setPreferredSize(new Dimension(245, 265));
         card.setBackground(Color.WHITE);
 
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(5, 5, 5, 5),
-                BorderFactory.createLineBorder(new Color(200, 200, 200), 1)
-        ));
+        card.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         JLabel imgLabel = new JLabel();
         imgLabel.setHorizontalAlignment(SwingConstants.CENTER);
