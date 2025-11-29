@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import model.User;
 import dao.UserDAO;
 import dao.UserDAOImpl;
+import util.PasswordValidator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -200,6 +201,11 @@ public class SettingsPanel extends JPanel {
             }
             if (!newP.equals(conf)) {
                 JOptionPane.showMessageDialog(this, "New passwords do not match.");
+                return;
+            }
+            
+            if (!PasswordValidator.isValidPassword(newP)) {
+                JOptionPane.showMessageDialog(this, PasswordValidator.getPasswordRequirements(), "Invalid Password", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 

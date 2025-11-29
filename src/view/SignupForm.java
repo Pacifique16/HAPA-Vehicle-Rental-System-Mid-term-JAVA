@@ -17,6 +17,7 @@ import javax.swing.ImageIcon;
 import model.User;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
+import util.PasswordValidator;
 
 
 public class SignupForm extends javax.swing.JFrame {
@@ -264,6 +265,11 @@ private void addPlaceholderPassword(javax.swing.JPasswordField field, String pla
 
     if (!password.equals(confirm)) {
         JOptionPane.showMessageDialog(this, "Passwords do NOT match!", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    if (!PasswordValidator.isValidPassword(password)) {
+        JOptionPane.showMessageDialog(this, PasswordValidator.getPasswordRequirements(), "Invalid Password", JOptionPane.ERROR_MESSAGE);
         return;
     }
 

@@ -13,6 +13,7 @@ package view;
 import dao.UserDAO;
 import dao.UserDAOImpl;
 import model.User;
+import util.PasswordValidator;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -362,8 +363,8 @@ public class ManageUsersPanel extends JPanel {
             String confirmPassword = new String(pfConfirmPassword.getPassword());
             
             if (editing == null || !password.isEmpty()) {
-                if (password.length() < 6) {
-                    JOptionPane.showMessageDialog(this, "Password must be at least 6 characters!");
+                if (!PasswordValidator.isValidPassword(password)) {
+                    JOptionPane.showMessageDialog(this, PasswordValidator.getPasswordRequirements(), "Invalid Password", JOptionPane.ERROR_MESSAGE);
                     pfPassword.requestFocus();
                     return false;
                 }
@@ -512,9 +513,9 @@ public class ManageUsersPanel extends JPanel {
         int sel = table.getSelectedRow();
         if (sel < 0) return;
         
-        String newPassword = JOptionPane.showInputDialog(this, "Enter new password (min 6 characters):");
-        if (newPassword == null || newPassword.length() < 6) {
-            JOptionPane.showMessageDialog(this, "Password must be at least 6 characters!");
+        String newPassword = JOptionPane.showInputDialog(this, "Enter new password:\n" + PasswordValidator.getPasswordRequirements());
+        if (newPassword == null || !PasswordValidator.isValidPassword(newPassword)) {
+            JOptionPane.showMessageDialog(this, PasswordValidator.getPasswordRequirements(), "Invalid Password", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
