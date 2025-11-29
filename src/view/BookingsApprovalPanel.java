@@ -118,25 +118,9 @@ public class BookingsApprovalPanel extends JPanel {
     private void loadAll(){
         model.setRowCount(0);
         try {
-            List<BookingRecord> list = bookingDAO.getPendingBookings();
-            for (BookingRecord r : list) {
-                Booking b = r.getBooking();
-                Vehicle v = r.getVehicle();
-                User u = bookingDAO.getCustomerForBooking(b.getCustomerId());
-                String customerName = u != null ? u.getFullName() : "Unknown";
-                String customerPhone = u != null ? u.getPhone() : "N/A";
-                
-                model.addRow(new Object[]{
-                    b.getId(), 
-                    customerName,
-                    customerPhone,
-                    v.getModel(), 
-                    v.getPlateNumber(),
-                    b.getStartDate().toString(), 
-                    b.getEndDate().toString(), 
-                    String.format("%.0f RWF", b.getTotalCost()), 
-                    b.getStatus()
-                });
+            List<Object[]> list = bookingDAO.getPendingBookingsReport();
+            for (Object[] row : list) {
+                model.addRow(row);
             }
         } catch(Exception ex){ 
             ex.printStackTrace();
@@ -148,27 +132,10 @@ public class BookingsApprovalPanel extends JPanel {
         String q = tfSearch.getText().trim().toLowerCase();
         model.setRowCount(0);
         try {
-            List<BookingRecord> allBookings = bookingDAO.getPendingBookings();
-            for (BookingRecord r : allBookings) {
-                Booking b = r.getBooking();
-                Vehicle v = r.getVehicle();
-                User u = bookingDAO.getCustomerForBooking(b.getCustomerId());
-                String customerName = u != null ? u.getFullName() : "Unknown";
-                String customerPhone = u != null ? u.getPhone() : "N/A";
-                
-                // Check if search query matches any field
-                if (q.isEmpty() || matchesSearch(customerName, customerPhone, v, b, q)) {
-                    model.addRow(new Object[]{
-                        b.getId(), 
-                        customerName,
-                        customerPhone,
-                        v.getModel(), 
-                        v.getPlateNumber(),
-                        b.getStartDate().toString(), 
-                        b.getEndDate().toString(), 
-                        String.format("%.0f RWF", b.getTotalCost()), 
-                        b.getStatus()
-                    });
+            List<Object[]> allBookings = bookingDAO.getPendingBookingsReport();
+            for (Object[] row : allBookings) {
+                if (q.isEmpty() || matchesSearchRow(row, q)) {
+                    model.addRow(row);
                 }
             }
         } catch (Exception ex) { 
@@ -176,15 +143,13 @@ public class BookingsApprovalPanel extends JPanel {
         }
     }
     
-    private boolean matchesSearch(String customerName, String customerPhone, Vehicle v, Booking b, String query) {
-        return (customerName != null && customerName.toLowerCase().contains(query)) ||
-               (customerPhone != null && customerPhone.toLowerCase().contains(query)) ||
-               (v.getModel() != null && v.getModel().toLowerCase().contains(query)) ||
-               (v.getPlateNumber() != null && v.getPlateNumber().toLowerCase().contains(query)) ||
-               (v.getCategory() != null && v.getCategory().toLowerCase().contains(query)) ||
-               (b.getStatus() != null && b.getStatus().toLowerCase().contains(query)) ||
-               b.getStartDate().toString().contains(query) ||
-               b.getEndDate().toString().contains(query);
+    private boolean matchesSearchRow(Object[] row, String query) {
+        for (int i = 1; i < row.length; i++) { // Skip ID column
+            if (row[i] != null && row[i].toString().toLowerCase().contains(query)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void doApprove(){
@@ -256,40 +221,25 @@ public class BookingsApprovalPanel extends JPanel {
     // New enhanced functionality methods
     private void doAdvancedSearch() {
         String selectedStatus = (String) statusFilter.getSelectedItem();
-        String searchText = tfSearch.getText().trim();
+        String searchText = tfSearch.getText().trim().toLowerCase();
         
         model.setRowCount(0);
         try {
-            List<BookingRecord> list = bookingDAO.getPendingBookings();
+            List<Object[]> list = bookingDAO.getPendingBookingsReport();
             
-            for (BookingRecord r : list) {
-                Booking b = r.getBooking();
-                Vehicle v = r.getVehicle();
-                User u = bookingDAO.getCustomerForBooking(b.getCustomerId());
-                String customerName = u != null ? u.getFullName() : "Unknown";
-                String customerPhone = u != null ? u.getPhone() : "N/A";
-                
+            for (Object[] row : list) {
                 // Apply search filter
-                if (!searchText.isEmpty() && !matchesSearch(customerName, customerPhone, v, b, searchText.toLowerCase())) {
+                if (!searchText.isEmpty() && !matchesSearchRow(row, searchText)) {
                     continue;
                 }
                 
                 // Apply status filter
-                if (!selectedStatus.equals("All Status") && !b.getStatus().equals(selectedStatus)) {
+                String status = row[8].toString(); // Status is at index 8
+                if (!selectedStatus.equals("All Status") && !status.equals(selectedStatus)) {
                     continue;
                 }
                 
-                model.addRow(new Object[]{
-                    b.getId(), 
-                    customerName,
-                    customerPhone,
-                    v.getModel(), 
-                    v.getPlateNumber(),
-                    b.getStartDate().toString(), 
-                    b.getEndDate().toString(), 
-                    String.format("%.0f RWF", b.getTotalCost()), 
-                    b.getStatus()
-                });
+                model.addRow(row);
             }
         } catch (Exception ex) { 
             ex.printStackTrace(); 
@@ -299,27 +249,34 @@ public class BookingsApprovalPanel extends JPanel {
     private void exportToCSV() {
         try {
             JFileChooser fc = new JFileChooser();
-            fc.setDialogTitle("Save CSV File");
+            fc.setDialogTitle("Save CSV Report");
+            fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("CSV files", "csv"));
             if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 String path = fc.getSelectedFile().getAbsolutePath();
                 if (!path.toLowerCase().endsWith(".csv")) path += ".csv";
                 
-                StringBuilder csv = new StringBuilder();
-                csv.append("Customer,Phone,Vehicle,Plate,Start Date,End Date,Total Cost,Status\\n");
-                
-                for (int i = 0; i < model.getRowCount(); i++) {
-                    for (int j = 1; j < model.getColumnCount(); j++) { // Skip ID
-                        csv.append(model.getValueAt(i, j));
-                        if (j < model.getColumnCount() - 1) csv.append(",");
+                try (java.io.FileWriter writer = new java.io.FileWriter(path)) {
+                    // Write title and timestamp
+                    writer.append("HAPA Vehicle Rental System - Bookings Approval Report\n");
+                    writer.append("Generated on: " + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date()) + "\n\n");
+                    
+                    // Write headers
+                    writer.append("Customer,Phone,Vehicle,Plate,Start Date,End Date,Total Cost,Status\n");
+                    
+                    // Write data
+                    for (int i = 0; i < model.getRowCount(); i++) {
+                        for (int j = 1; j < model.getColumnCount(); j++) { // Skip ID
+                            String cellValue = model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString().replace(",", ";") : "";
+                            writer.append(cellValue);
+                            if (j < model.getColumnCount() - 1) writer.append(",");
+                        }
+                        writer.append("\n");
                     }
-                    csv.append("\\n");
                 }
-                
-                java.nio.file.Files.write(java.nio.file.Paths.get(path), csv.toString().getBytes());
-                JOptionPane.showMessageDialog(this, "Exported to: " + path);
+                JOptionPane.showMessageDialog(this, "Report exported successfully to: " + path);
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Export failed: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Export failed: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     

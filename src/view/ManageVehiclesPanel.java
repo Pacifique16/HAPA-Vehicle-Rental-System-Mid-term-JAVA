@@ -448,27 +448,34 @@ public class ManageVehiclesPanel extends JPanel {
     private void exportToCSV() {
         try {
             JFileChooser fc = new JFileChooser();
-            fc.setDialogTitle("Save CSV File");
+            fc.setDialogTitle("Save CSV Report");
+            fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("CSV files", "csv"));
             if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 String path = fc.getSelectedFile().getAbsolutePath();
                 if (!path.toLowerCase().endsWith(".csv")) path += ".csv";
                 
-                StringBuilder csv = new StringBuilder();
-                csv.append("Plate,Model,Category,Fuel,Transmission,Seats,Price,Status\n");
-                
-                for (int i = 0; i < model.getRowCount(); i++) {
-                    for (int j = 1; j < model.getColumnCount() - 1; j++) { // Skip ID and Image
-                        csv.append(model.getValueAt(i, j));
-                        if (j < model.getColumnCount() - 2) csv.append(",");
+                try (java.io.FileWriter writer = new java.io.FileWriter(path)) {
+                    // Write title and timestamp
+                    writer.append("HAPA Vehicle Rental System - Vehicles Report\n");
+                    writer.append("Generated on: " + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date()) + "\n\n");
+                    
+                    // Write headers
+                    writer.append("Plate Number,Model,Category,Fuel Type,Transmission,Seats,Price per Day,Status\n");
+                    
+                    // Write data
+                    for (int i = 0; i < model.getRowCount(); i++) {
+                        for (int j = 1; j < model.getColumnCount() - 1; j++) { // Skip ID and Image
+                            String cellValue = model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString().replace(",", ";") : "";
+                            writer.append(cellValue);
+                            if (j < model.getColumnCount() - 2) writer.append(",");
+                        }
+                        writer.append("\n");
                     }
-                    csv.append("\n");
                 }
-                
-                java.nio.file.Files.write(java.nio.file.Paths.get(path), csv.toString().getBytes());
-                JOptionPane.showMessageDialog(this, "Exported to: " + path);
+                JOptionPane.showMessageDialog(this, "Report exported successfully to: " + path);
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Export failed: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Export failed: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     

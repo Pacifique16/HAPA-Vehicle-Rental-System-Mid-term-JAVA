@@ -66,5 +66,13 @@ public interface BookingDAO {
     public List<BookingRecord> getBookingsHistory();
     
     public boolean isVehicleAvailableOn(int vehicleId, Date date);
+    
+    public List<Object[]> getVehicleAvailabilityReport(Date date);
+    
+    public List<Object[]> getActiveRentalsReport();
+    
+    public List<Object[]> getBookingsHistoryReport();
+    
+    public List<Object[]> getPendingBookingsReport();
 }
 

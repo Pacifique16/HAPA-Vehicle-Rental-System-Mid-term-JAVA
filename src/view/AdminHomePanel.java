@@ -48,7 +48,6 @@ public class AdminHomePanel extends JPanel {
         buildRecent();
         loadAnalytics();
         loadRecentBookings();
-        startAutoRefresh();
     }
 
     private void buildTopCards(){
@@ -120,23 +119,33 @@ public class AdminHomePanel extends JPanel {
 
     private void loadAnalytics(){
         try {
-            int totalVehicles = vehicleDAO.countVehicles();
-            int totalUsers = userDAO.countUsers();
-            int totalRentals = bookingDAO.countTotalRentals();
-            int availableToday = vehicleDAO.countAvailableToday();
-
-            System.out.println("Analytics Debug:");
-            System.out.println("Total Vehicles: " + totalVehicles);
-            System.out.println("Total Users: " + totalUsers);
-            System.out.println("Total Rentals: " + totalRentals);
-            System.out.println("Available Today: " + availableToday);
-
-            lblVehicles.setText("<html><div style='text-align:center'><div style='font-size:20px;color:#222;'>" + totalVehicles + "</div><div style='font-size:12px;color:#666;'>Total Vehicles</div></div></html>");
-            lblUsers.setText("<html><div style='text-align:center'><div style='font-size:20px;color:#222;'>" + totalUsers + "</div><div style='font-size:12px;color:#666;'>Total Users</div></div></html>");
-            lblRentals.setText("<html><div style='text-align:center'><div style='font-size:20px;color:#222;'>" + totalRentals + "</div><div style='font-size:12px;color:#666;'>Total Rentals</div></div></html>");
-            lblAvailable.setText("<html><div style='text-align:center'><div style='font-size:20px;color:#222;'>" + availableToday + "</div><div style='font-size:12px;color:#666;'>Vehicles Available Today</div></div></html>");
+            // Single query to get all analytics data
+            String sql = "SELECT " +
+                        "(SELECT COUNT(*) FROM vehicles) as total_vehicles, " +
+                        "(SELECT COUNT(*) FROM users) as total_users, " +
+                        "(SELECT COUNT(*) FROM bookings WHERE status != 'REJECTED') as total_rentals, " +
+                        "(SELECT COUNT(*) FROM vehicles v WHERE v.status != 'Maintenance' " +
+                        " AND NOT EXISTS (SELECT 1 FROM bookings b WHERE b.vehicle_id = v.id " +
+                        " AND b.status NOT IN ('CANCELLED', 'REJECTED') " +
+                        " AND CURRENT_DATE BETWEEN b.start_date AND b.end_date)) as available_today";
+            
+            try (Connection con = DBConnection.getConnection();
+                 PreparedStatement pst = con.prepareStatement(sql);
+                 ResultSet rs = pst.executeQuery()) {
+                
+                if (rs.next()) {
+                    int totalVehicles = rs.getInt("total_vehicles");
+                    int totalUsers = rs.getInt("total_users");
+                    int totalRentals = rs.getInt("total_rentals");
+                    int availableToday = rs.getInt("available_today");
+                    
+                    lblVehicles.setText("<html><div style='text-align:center'><div style='font-size:20px;color:#222;'>" + totalVehicles + "</div><div style='font-size:12px;color:#666;'>Total Vehicles</div></div></html>");
+                    lblUsers.setText("<html><div style='text-align:center'><div style='font-size:20px;color:#222;'>" + totalUsers + "</div><div style='font-size:12px;color:#666;'>Total Users</div></div></html>");
+                    lblRentals.setText("<html><div style='text-align:center'><div style='font-size:20px;color:#222;'>" + totalRentals + "</div><div style='font-size:12px;color:#666;'>Total Rentals</div></div></html>");
+                    lblAvailable.setText("<html><div style='text-align:center'><div style='font-size:20px;color:#222;'>" + availableToday + "</div><div style='font-size:12px;color:#666;'>Vehicles Available Today</div></div></html>");
+                }
+            }
         } catch (Exception ex){
-            System.out.println("Analytics error: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -178,13 +187,7 @@ public class AdminHomePanel extends JPanel {
         }
     }
     
-    private void startAutoRefresh() {
-        Timer timer = new Timer(30000, e -> {
-            loadAnalytics();
-            loadRecentBookings();
-        });
-        timer.start();
-    }
+    // Removed auto-refresh to prevent unnecessary database calls
     
     private void showBookingDetails() {
         int row = recentBookingsTable.getSelectedRow();

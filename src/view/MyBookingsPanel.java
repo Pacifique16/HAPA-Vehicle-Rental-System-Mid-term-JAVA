@@ -121,7 +121,7 @@ public class MyBookingsPanel extends JPanel {
         pSearch.add(tfModel, BorderLayout.CENTER);
 
         // Status combo
-        cbStatus = new JComboBox<>(new String[]{"", "PENDING", "APPROVED", "REJECTED", "CANCELLED", "EXPIRED"});
+        cbStatus = new JComboBox<>(new String[]{"All status", "PENDING", "APPROVED", "REJECTED", "CANCELLED", "EXPIRED"});
         styleRounded(cbStatus);
         cbStatus.setPreferredSize(new Dimension(140, cbStatus.getPreferredSize().height));
         cbStatus.setToolTipText("Filter by status");
@@ -418,13 +418,12 @@ public class MyBookingsPanel extends JPanel {
     
     private void applyFiltersAndLoad() {
         
-            // Auto-expire before filtering
-        bookingDAO.expireOldBookings();
+            // Removed auto-expire to reduce database calls
 
         
         String modelLike = tfModel.getText().trim();
         String status = (String) cbStatus.getSelectedItem();
-        if (status != null && status.isEmpty()) status = null;
+        if (status != null && (status.isEmpty() || status.equals("All status"))) status = null;
 
         Date from = getFilterFrom();
         Date to = getFilterTo();
@@ -623,9 +622,8 @@ public class MyBookingsPanel extends JPanel {
         int modelIndex = table.convertRowIndexToModel(sel);
         int bookingId = Integer.parseInt(tableModel.getValueAt(modelIndex, 0).toString());
 
-        List<BookingRecord> list = bookingDAO.getFilteredBookings(user.getId(), tfModel.getText().trim(), getFilterFrom(), getFilterTo(), (String)cbStatus.getSelectedItem());
         BookingRecord rec = null;
-        for (BookingRecord r : list) if (r.getBooking().getId() == bookingId) { rec = r; break; }
+        for (BookingRecord r : currentSearchResults) if (r.getBooking().getId() == bookingId) { rec = r; break; }
         if (rec == null) return;
         Booking b = rec.getBooking();
 
@@ -687,54 +685,47 @@ public class MyBookingsPanel extends JPanel {
     }
 
     private void exportCsvCurrentFiltered() {
-        String modelLike = tfModel.getText().trim();
-        String status = (String) cbStatus.getSelectedItem();
-        if (status != null && status.isEmpty()) status = null;
-        Date from = getFilterFrom();
-        Date to = getFilterTo();
-
-        List<BookingRecord> all = bookingDAO.getFilteredBookings(user.getId(), modelLike, from, to, status);
-
-        if (all.isEmpty()) {
+        if (currentSearchResults.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No records to export.");
             return;
         }
 
         JFileChooser fc = new JFileChooser();
-        fc.setDialogTitle("Save CSV");
-        fc.setFileFilter(new FileNameExtensionFilter("CSV files", "csv"));
+        fc.setDialogTitle("Save CSV Report");
+        fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("CSV files", "csv"));
         int ret = fc.showSaveDialog(this);
         if (ret != JFileChooser.APPROVE_OPTION) return;
-
+        
         String path = fc.getSelectedFile().getAbsolutePath();
         if (!path.toLowerCase().endsWith(".csv")) path += ".csv";
-
-        try (FileWriter fw = new FileWriter(path)) {
-            fw.append("booking_id,customer_id,vehicle_id,vehicle_model,plate_number,category,price_per_day,image_path,fuel_type,transmission,seats,start_date,end_date,total_cost,status\n");
+        
+        try (java.io.FileWriter writer = new java.io.FileWriter(path)) {
+            // Write title and timestamp
+            writer.append("HAPA Vehicle Rental System - My Bookings Report\n");
+            writer.append("Generated on: " + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date()) + "\n\n");
+            
+            // Write headers
+            writer.append("Vehicle Model,Start Date,End Date,Days,Total Cost,Status\n");
+            
+            // Write data
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            for (BookingRecord r : all) {
+            for (BookingRecord r : currentSearchResults) {
                 Booking b = r.getBooking();
                 Vehicle v = r.getVehicle();
-                fw.append(String.valueOf(b.getId())).append(",");
-                fw.append(String.valueOf(b.getCustomerId())).append(",");
-                fw.append(String.valueOf(b.getVehicleId())).append(",");
-                fw.append(escapeCsv(v.getModel())).append(",");
-                fw.append(escapeCsv(v.getPlateNumber())).append(",");
-                fw.append(escapeCsv(v.getCategory())).append(",");
-                fw.append(String.format("%,.0f", v.getPricePerDay())).append(",");
-                fw.append(escapeCsv(v.getImagePath())).append(",");
-                fw.append(escapeCsv(v.getFuelType())).append(",");
-                fw.append(escapeCsv(v.getTransmission())).append(",");
-                fw.append(String.valueOf(v.getSeats())).append(",");
-                fw.append(df.format(b.getStartDate())).append(",");
-                fw.append(df.format(b.getEndDate())).append(",");
-                fw.append(String.format("%.2f", b.getTotalCost())).append(",");
-                fw.append(escapeCsv(b.getStatus())).append("\n");
+                long days = Math.max(1L, (b.getEndDate().getTime() - b.getStartDate().getTime())/(1000L*60*60*24) + 1);
+                
+                String cellValue = v.getModel().replace(",", ";");
+                writer.append(cellValue).append(",");
+                writer.append(df.format(b.getStartDate())).append(",");
+                writer.append(df.format(b.getEndDate())).append(",");
+                writer.append(String.valueOf(days)).append(",");
+                writer.append(String.format("%,.0f RWF", b.getTotalCost())).append(",");
+                writer.append(b.getStatus()).append("\n");
             }
-            JOptionPane.showMessageDialog(this, "Exported to: " + path);
+            JOptionPane.showMessageDialog(this, "Report exported successfully to: " + path);
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Failed to export: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Export failed: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

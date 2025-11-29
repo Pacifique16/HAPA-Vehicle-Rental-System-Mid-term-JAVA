@@ -272,12 +272,10 @@ public class LoginForm extends javax.swing.JFrame {
             // Check role match
             if (isStaff && user.getRole().equals("admin")) {
                 // Staff login successful
-                JOptionPane.showMessageDialog(this, "Welcome Admin: " + user.getFullName());
                 new AdminDashboard(user).setVisible(true);
                 this.dispose();
             } else if (!isStaff && user.getRole().equals("customer")) {
                 // Customer login successful
-                JOptionPane.showMessageDialog(this, "Welcome Customer: " + user.getFullName());
                 new CustomerDashboard(user).setVisible(true);
                 this.dispose();
             } else {

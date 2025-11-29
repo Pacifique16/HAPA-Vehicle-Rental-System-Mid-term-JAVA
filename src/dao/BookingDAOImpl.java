@@ -452,16 +452,146 @@ public class BookingDAOImpl implements BookingDAO {
     }
 
     @Override
+    public List<Object[]> getActiveRentalsReport() {
+        List<Object[]> list = new ArrayList<>();
+        String sql = "SELECT u.full_name, v.model, b.start_date, b.end_date, b.total_cost, b.status " +
+                     "FROM bookings b " +
+                     "JOIN vehicles v ON b.vehicle_id = v.id " +
+                     "JOIN users u ON b.customer_id = u.id " +
+                     "WHERE b.status = 'APPROVED' AND b.start_date <= CURRENT_DATE AND b.end_date >= CURRENT_DATE " +
+                     "ORDER BY b.start_date ASC";
+        
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            
+            while (rs.next()) {
+                list.add(new Object[] {
+                    rs.getString("full_name"),
+                    rs.getString("model"),
+                    rs.getDate("start_date"),
+                    rs.getDate("end_date"),
+                    String.format("%,.0f RWF", rs.getDouble("total_cost")),
+                    rs.getString("status")
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
+    @Override
     public List<BookingRecord> getActiveRentals() {
         List<BookingRecord> list = new ArrayList<>();
-        // Simplified implementation - return empty list for now
+        String sql = "SELECT b.id AS b_id, b.customer_id, b.vehicle_id, b.start_date, b.end_date, b.total_cost, b.status, " +
+                     "v.id AS v_id, v.plate_number, v.model, v.category, v.price_per_day, v.image_path, v.fuel_type, v.transmission, v.seats " +
+                     "FROM bookings b JOIN vehicles v ON b.vehicle_id = v.id " +
+                     "WHERE b.status = 'APPROVED' AND b.start_date <= CURRENT_DATE AND b.end_date >= CURRENT_DATE " +
+                     "ORDER BY b.start_date ASC";
+        
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            
+            while (rs.next()) {
+                Booking b = new Booking();
+                b.setId(rs.getInt("b_id"));
+                b.setCustomerId(rs.getInt("customer_id"));
+                b.setVehicleId(rs.getInt("vehicle_id"));
+                b.setStartDate(rs.getDate("start_date"));
+                b.setEndDate(rs.getDate("end_date"));
+                b.setTotalCost(rs.getDouble("total_cost"));
+                b.setStatus(rs.getString("status"));
+                
+                Vehicle v = new Vehicle();
+                v.setId(rs.getInt("v_id"));
+                v.setPlateNumber(rs.getString("plate_number"));
+                v.setModel(rs.getString("model"));
+                v.setCategory(rs.getString("category"));
+                v.setPricePerDay(rs.getDouble("price_per_day"));
+                v.setImagePath(rs.getString("image_path"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setTransmission(rs.getString("transmission"));
+                v.setSeats(rs.getInt("seats"));
+                
+                list.add(new BookingRecord(b, v));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
+    @Override
+    public List<Object[]> getBookingsHistoryReport() {
+        List<Object[]> list = new ArrayList<>();
+        String sql = "SELECT u.full_name, v.model, b.start_date, b.end_date, b.total_cost, b.status " +
+                     "FROM bookings b " +
+                     "JOIN vehicles v ON b.vehicle_id = v.id " +
+                     "JOIN users u ON b.customer_id = u.id " +
+                     "WHERE b.status IN ('APPROVED', 'EXPIRED', 'CANCELLED') " +
+                     "ORDER BY b.end_date DESC";
+        
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            
+            while (rs.next()) {
+                list.add(new Object[] {
+                    rs.getString("full_name"),
+                    rs.getString("model"),
+                    rs.getDate("start_date"),
+                    rs.getDate("end_date"),
+                    String.format("%,.0f RWF", rs.getDouble("total_cost")),
+                    rs.getString("status")
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
     
     @Override
     public List<BookingRecord> getBookingsHistory() {
         List<BookingRecord> list = new ArrayList<>();
-        // Simplified implementation - return empty list for now
+        String sql = "SELECT b.id AS b_id, b.customer_id, b.vehicle_id, b.start_date, b.end_date, b.total_cost, b.status, " +
+                     "v.id AS v_id, v.plate_number, v.model, v.category, v.price_per_day, v.image_path, v.fuel_type, v.transmission, v.seats " +
+                     "FROM bookings b JOIN vehicles v ON b.vehicle_id = v.id " +
+                     "WHERE b.status IN ('APPROVED', 'EXPIRED', 'CANCELLED') " +
+                     "ORDER BY b.end_date DESC";
+        
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            
+            while (rs.next()) {
+                Booking b = new Booking();
+                b.setId(rs.getInt("b_id"));
+                b.setCustomerId(rs.getInt("customer_id"));
+                b.setVehicleId(rs.getInt("vehicle_id"));
+                b.setStartDate(rs.getDate("start_date"));
+                b.setEndDate(rs.getDate("end_date"));
+                b.setTotalCost(rs.getDouble("total_cost"));
+                b.setStatus(rs.getString("status"));
+                
+                Vehicle v = new Vehicle();
+                v.setId(rs.getInt("v_id"));
+                v.setPlateNumber(rs.getString("plate_number"));
+                v.setModel(rs.getString("model"));
+                v.setCategory(rs.getString("category"));
+                v.setPricePerDay(rs.getDouble("price_per_day"));
+                v.setImagePath(rs.getString("image_path"));
+                v.setFuelType(rs.getString("fuel_type"));
+                v.setTransmission(rs.getString("transmission"));
+                v.setSeats(rs.getInt("seats"));
+                
+                list.add(new BookingRecord(b, v));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
     
@@ -488,13 +618,13 @@ public class BookingDAOImpl implements BookingDAO {
         List<Object[]> list = new ArrayList<>();
 
         String sql =
-            "SELECT v.model, COUNT(b.id) AS times_rented, " +
-            "SUM(b.total_cost) AS total_income " +
-            "FROM bookings b " +
-            "JOIN vehicles v ON b.vehicle_id = v.id " +
-            "WHERE b.status = 'APPROVED' " +
+            "SELECT v.model, " +
+            "COUNT(CASE WHEN b.status IN ('APPROVED', 'EXPIRED') THEN 1 END) AS times_rented, " +
+            "COALESCE(SUM(CASE WHEN b.status IN ('APPROVED', 'EXPIRED') THEN b.total_cost END), 0) AS total_income " +
+            "FROM vehicles v " +
+            "LEFT JOIN bookings b ON v.id = b.vehicle_id " +
             "GROUP BY v.model " +
-            "ORDER BY times_rented DESC";
+            "ORDER BY times_rented DESC, total_income DESC";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement pst = con.prepareStatement(sql);
@@ -518,6 +648,74 @@ public class BookingDAOImpl implements BookingDAO {
 
 
 
+
+    @Override
+    public List<Object[]> getVehicleAvailabilityReport(Date date) {
+        List<Object[]> list = new ArrayList<>();
+        
+        String sql = "SELECT v.model, v.category, v.price_per_day, " +
+                     "CASE WHEN v.status = 'Maintenance' THEN 'No' " +
+                     "     WHEN EXISTS (SELECT 1 FROM bookings b WHERE b.vehicle_id = v.id " +
+                     "                  AND b.status NOT IN ('CANCELLED', 'REJECTED') " +
+                     "                  AND ? BETWEEN b.start_date AND b.end_date) THEN 'No' " +
+                     "     ELSE 'Yes' END AS available " +
+                     "FROM vehicles v ORDER BY v.model";
+        
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            
+            pst.setDate(1, new java.sql.Date(date.getTime()));
+            
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new Object[] {
+                        rs.getString("model"),
+                        rs.getString("category"),
+                        String.format("%,.0f RWF", rs.getDouble("price_per_day")),
+                        rs.getString("available")
+                    });
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return list;
+    }
+
+    @Override
+    public List<Object[]> getPendingBookingsReport() {
+        List<Object[]> list = new ArrayList<>();
+        String sql = "SELECT b.id, u.full_name, u.phone, v.model, v.plate_number, " +
+                     "b.start_date, b.end_date, b.total_cost, b.status " +
+                     "FROM bookings b " +
+                     "JOIN vehicles v ON b.vehicle_id = v.id " +
+                     "JOIN users u ON b.customer_id = u.id " +
+                     "WHERE b.status = 'PENDING' " +
+                     "ORDER BY b.start_date ASC";
+        
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            
+            while (rs.next()) {
+                list.add(new Object[] {
+                    rs.getInt("id"),
+                    rs.getString("full_name"),
+                    rs.getString("phone"),
+                    rs.getString("model"),
+                    rs.getString("plate_number"),
+                    rs.getDate("start_date").toString(),
+                    rs.getDate("end_date").toString(),
+                    String.format("%.0f RWF", rs.getDouble("total_cost")),
+                    rs.getString("status")
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 
     @Override
     public List<BookingRecord> getPendingBookings() {
