@@ -61,7 +61,7 @@ public class AdminReportsPanel extends JPanel {
         top.setBackground(Color.WHITE);
         top.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        JLabel titleLabel = new JLabel("📈 Reports & Analytics");
+        JLabel titleLabel = new JLabel("Reports & Analytics");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
         titleLabel.setForeground(new Color(34, 109, 180));
         
@@ -89,14 +89,14 @@ public class AdminReportsPanel extends JPanel {
         tblActive.setRowHeight(25);
         tblActive.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tblActive.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-        tabs.addTab("🚗 Active Rentals", new JScrollPane(tblActive));
+        tabs.addTab("Active Rentals", new JScrollPane(tblActive));
 
         // Most rented
         tblMostRented = new JTable(new DefaultTableModel(new String[]{"Vehicle Model","Times Rented","Total Income"},0));
         tblMostRented.setRowHeight(25);
         tblMostRented.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tblMostRented.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-        tabs.addTab("📊 Most Rented", new JScrollPane(tblMostRented));
+        tabs.addTab("Most Rented", new JScrollPane(tblMostRented));
 
         // Availability
         tblAvailability = new JTable(new DefaultTableModel(new String[]{"Vehicle Model","Category","Price/Day","Available Today"},0));
@@ -122,14 +122,14 @@ public class AdminReportsPanel extends JPanel {
             }
         });
         
-        tabs.addTab("✅ Availability", new JScrollPane(tblAvailability));
+        tabs.addTab("Availability", new JScrollPane(tblAvailability));
 
         // History
         tblHistory = new JTable(new DefaultTableModel(new String[]{"Customer","Vehicle","Start Date","End Date","Total Cost","Status"},0));
         tblHistory.setRowHeight(25);
         tblHistory.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tblHistory.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-        tabs.addTab("📋 History", new JScrollPane(tblHistory));
+        tabs.addTab("History", new JScrollPane(tblHistory));
 
         add(tabs, BorderLayout.CENTER);
 
