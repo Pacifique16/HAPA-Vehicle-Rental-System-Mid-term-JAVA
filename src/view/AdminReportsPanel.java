@@ -68,7 +68,7 @@ public class AdminReportsPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBackground(Color.WHITE);
         
-        JButton btnPdf = new JButton("📄 Export to CSV");
+        JButton btnPdf = new JButton("Export to CSV");
         btnPdf.setBackground(new Color(255, 217, 102));
         btnPdf.setFocusPainted(false);
         btnPdf.addActionListener(e -> exportCurrentTab());

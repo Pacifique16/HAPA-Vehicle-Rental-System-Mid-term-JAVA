@@ -74,5 +74,7 @@ public interface BookingDAO {
     public List<Object[]> getBookingsHistoryReport();
     
     public List<Object[]> getPendingBookingsReport();
+    
+    public String getNextAvailableDates(int vehicleId, Date requestedStart, Date requestedEnd);
 }
 

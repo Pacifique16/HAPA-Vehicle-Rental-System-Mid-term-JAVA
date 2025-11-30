@@ -63,7 +63,7 @@ public class ManageVehiclesPanel extends JPanel {
         tfSearch.addActionListener(e -> doSearch());
 
         // Filter components
-        categoryFilter = new JComboBox<>(new String[]{"All Categories", "SUV", "Sedan", "Hatchback", "Truck", "Van"});
+        categoryFilter = new JComboBox<>(new String[]{"All Categories", "SUV", "Sedan", "Hatchback", "Truck", "Van", "Coupe", "Luxury", "Supercar", "Off Road", "Ultra Luxury"});
         statusFilter = new JComboBox<>(new String[]{"All Status", "Available", "Rented", "Maintenance"});
         
         categoryFilter.addActionListener(e -> doAdvancedSearch());
@@ -260,7 +260,7 @@ public class ManageVehiclesPanel extends JPanel {
             tfModel = new JTextField(v==null?"":v.getModel());
             tfModel.setPreferredSize(new java.awt.Dimension(200, 25));
             
-            cbCategory = new JComboBox<>(new String[]{"SUV", "Sedan", "Hatchback", "Truck", "Van", "Coupe"});
+            cbCategory = new JComboBox<>(new String[]{"SUV", "Sedan", "Hatchback", "Truck", "Van", "Coupe", "Luxury", "Supercar", "Off Road", "Ultra Luxury"});
             cbCategory.setPreferredSize(new java.awt.Dimension(200, 25));
             if (v != null) cbCategory.setSelectedItem(v.getCategory());
             

@@ -266,8 +266,10 @@ public class BookingForm extends JDialog {
 
        // 2️⃣ ANY USER — date overlaps (vehicle unavailable)
        if (dao.isVehicleUnavailable(vehicle.getId(), s, e)) {
+           String availabilityInfo = dao.getNextAvailableDates(vehicle.getId(), s, e);
            JOptionPane.showMessageDialog(this,
-                   "This vehicle is already booked by another customer in the selected date range.\n"
+                   "This vehicle is already booked by another customer in the selected date range.\n\n"
+                   + availabilityInfo + "\n\n"
                    + "Please choose different dates.",
                    "Vehicle Unavailable",
                    JOptionPane.WARNING_MESSAGE);

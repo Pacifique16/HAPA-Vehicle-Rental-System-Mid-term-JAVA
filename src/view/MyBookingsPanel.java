@@ -104,12 +104,7 @@ public class MyBookingsPanel extends JPanel {
         JPanel pSearch = new JPanel(new BorderLayout(6, 0));
         pSearch.setBackground(Color.WHITE);
         
-        JLabel searchIcon;
-        if (icoSearch != null) {
-            searchIcon = new JLabel(icoSearch);   // icon version
-        } else {
-            searchIcon = new JLabel("🔍");        // text fallback
-        }
+        JLabel searchIcon = new JLabel("Search:");
 
         
         searchIcon.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
@@ -126,19 +121,11 @@ public class MyBookingsPanel extends JPanel {
         cbStatus.setPreferredSize(new Dimension(140, cbStatus.getPreferredSize().height));
         cbStatus.setToolTipText("Filter by status");
 
-        // Date 'From' (with calendar icon)
+        // Date 'From' (with Start label)
         JPanel pFrom = new JPanel(new BorderLayout(6, 0));
         pFrom.setBackground(Color.WHITE);
         
-        JLabel calFrom;
-        if (icoCalendar != null) {
-            calFrom = new JLabel(icoCalendar);
-        } else {
-            calFrom = new JLabel("📅");
-        }
-        calFrom.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
-
-        
+        JLabel calFrom = new JLabel("Start:");
         calFrom.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
         spFrom = new JSpinner(new SpinnerDateModel());
         spFrom.setEditor(new JSpinner.DateEditor(spFrom, "yyyy-MM-dd"));
@@ -156,15 +143,7 @@ public class MyBookingsPanel extends JPanel {
         JPanel pTo = new JPanel(new BorderLayout(6, 0));
         pTo.setBackground(Color.WHITE);
         
-        JLabel calTo;
-        if (icoCalendar != null) {
-            calTo = new JLabel(icoCalendar);
-        } else {
-            calTo = new JLabel("📅");
-        }
-        calTo.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
-
-
+        JLabel calTo = new JLabel("End:");
         calTo.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
         spTo = new JSpinner(new SpinnerDateModel());
         spTo.setEditor(new JSpinner.DateEditor(spTo, "yyyy-MM-dd"));

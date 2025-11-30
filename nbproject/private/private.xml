@@ -2,6 +2,33 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/model/Vehicle.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/AdminDashboard.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/dao/DBConnection.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/BookingForm.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/dao/UserDAO.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/AdminReportsPanel.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/dao/BookingDAOImpl.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/SettingsPanel.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/SignupForm.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/util/PasswordValidator.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/dao/BookingDAO.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/BookingsApprovalPanel.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/AdminHomePanel.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/WrapLayout.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/model/BookingRecord.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/model/Booking.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/dao/VehicleDAOImpl.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/BookVehiclePanel.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/LoginForm.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/MyBookingsPanel.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/model/User.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/ManageUsersPanel.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/ManageVehiclesPanel.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/view/CustomerDashboard.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/dao/UserDAOImpl.java</file>
+            <file>file:/C:/Users/Pacifique%20Harerimana/OneDrive/Desktop/AUCA/Semester%207/Java/HAPA_Vehicle_Rental_System/src/dao/VehicleDAO.java</file>
+        </group>
     </open-files>
 </project-private>

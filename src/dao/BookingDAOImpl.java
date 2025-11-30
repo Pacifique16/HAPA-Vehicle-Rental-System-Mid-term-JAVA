@@ -757,7 +757,38 @@ public class BookingDAOImpl implements BookingDAO {
         }
         return list;
     }
-
-
+    
+    @Override
+    public String getNextAvailableDates(int vehicleId, Date requestedStart, Date requestedEnd) {
+        String sql = "SELECT start_date, end_date FROM bookings " +
+                     "WHERE vehicle_id = ? AND status NOT IN ('CANCELLED', 'REJECTED') " +
+                     "AND (start_date <= ? AND end_date >= ?) " +
+                     "ORDER BY start_date ASC";
+        
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            
+            pst.setInt(1, vehicleId);
+            pst.setDate(2, new java.sql.Date(requestedEnd.getTime()));
+            pst.setDate(3, new java.sql.Date(requestedStart.getTime()));
+            
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    Date bookedEnd = rs.getDate("end_date");
+                    java.util.Calendar cal = java.util.Calendar.getInstance();
+                    cal.setTime(bookedEnd);
+                    cal.add(java.util.Calendar.DAY_OF_MONTH, 1);
+                    Date nextAvailable = cal.getTime();
+                    
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                    return "Vehicle will be available from " + sdf.format(nextAvailable) + " onwards.";
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return "Please check availability for different dates.";
+    }
 
 }
