@@ -1,15 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * HAPA Vehicle Rental System - Booking Data Access Object Implementation
+ * Implements all database operations related to booking management
+ * Provides comprehensive booking functionality including CRUD operations,
+ * filtering, pagination, reporting, validation, and availability management
  */
 package dao;
 
 /**
+ * BookingDAOImpl - Implementation of BookingDAO interface
+ * Provides concrete database operations for comprehensive booking management
+ * Handles booking CRUD operations, filtering, validation, reporting, and analytics
  *
  * @author Pacifique Harerimana
  */
-
 
 import model.Booking;
 import model.BookingRecord;
@@ -21,8 +24,19 @@ import java.util.List;
 import java.util.Date;
 import model.User;
 
+/**
+ * Implementation class for booking database operations
+ * Provides concrete methods for booking management, validation, and reporting
+ */
 public class BookingDAOImpl implements BookingDAO {
 
+    /**
+     * Adds a new booking to the database
+     * Creates a new booking record with all necessary details
+     * 
+     * @param b Booking object containing booking information
+     * @return true if booking was successfully added, false otherwise
+     */
     @Override
     public boolean addBooking(Booking b) {
         String sql = "INSERT INTO bookings (customer_id, vehicle_id, start_date, end_date, total_cost, status) "
@@ -31,6 +45,7 @@ public class BookingDAOImpl implements BookingDAO {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
 
+            // Set all booking parameters
             pst.setInt(1, b.getCustomerId());
             pst.setInt(2, b.getVehicleId());
             pst.setDate(3, new java.sql.Date(b.getStartDate().getTime()));
@@ -46,12 +61,29 @@ public class BookingDAOImpl implements BookingDAO {
         }
     }
 
-    // basic method left for compatibility
+    /**
+     * Retrieves all bookings for a specific customer (legacy method)
+     * Delegates to filtered bookings method for compatibility
+     * 
+     * @param customerId ID of the customer
+     * @return List of booking records for the customer
+     */
     @Override
     public List<BookingRecord> getBookingsByCustomer(int customerId) {
         return getFilteredBookings(customerId, null, null, null, null);
     }
 
+    /**
+     * Retrieves filtered bookings without pagination
+     * Delegates to paginated method with maximum limit
+     * 
+     * @param customerId ID of the customer
+     * @param modelLike Vehicle model search term
+     * @param dateFrom Start date filter
+     * @param dateTo End date filter
+     * @param status Booking status filter
+     * @return List of filtered booking records
+     */
     @Override
     public List<BookingRecord> getFilteredBookings(int customerId, String modelLike, java.util.Date dateFrom, java.util.Date dateTo, String status) {
         return getFilteredBookingsPaged(customerId, modelLike, dateFrom, dateTo, status, Integer.MAX_VALUE, 0);
@@ -299,6 +331,11 @@ public class BookingDAOImpl implements BookingDAO {
     }
 
 
+    /**
+     * Automatically expires bookings that have passed their end date
+     * Updates booking status to EXPIRED for bookings with end_date < current_date
+     * Excludes already cancelled, rejected, or expired bookings
+     */
     public void expireOldBookings() {
         String sql = "UPDATE bookings " +
                      "SET status = 'EXPIRED' " +
@@ -342,6 +379,12 @@ public class BookingDAOImpl implements BookingDAO {
         }
     }
 
+    /**
+     * Counts total number of rentals (excluding rejected bookings)
+     * Used for dashboard statistics and reporting
+     * 
+     * @return Total count of rentals
+     */
     @Override
     public int countTotalRentals() {
         String sql = "SELECT COUNT(*) FROM bookings WHERE status != 'REJECTED'";
@@ -758,6 +801,15 @@ public class BookingDAOImpl implements BookingDAO {
         return list;
     }
     
+    /**
+     * Gets next available dates for a vehicle when requested dates are unavailable
+     * Finds conflicting bookings and calculates when vehicle will be available
+     * 
+     * @param vehicleId ID of the vehicle
+     * @param requestedStart Requested start date
+     * @param requestedEnd Requested end date
+     * @return String message indicating when vehicle will be available
+     */
     @Override
     public String getNextAvailableDates(int vehicleId, Date requestedStart, Date requestedEnd) {
         String sql = "SELECT start_date, end_date FROM bookings " +
@@ -774,6 +826,7 @@ public class BookingDAOImpl implements BookingDAO {
             
             try (ResultSet rs = pst.executeQuery()) {
                 if (rs.next()) {
+                    // Calculate next available date (day after booking ends)
                     Date bookedEnd = rs.getDate("end_date");
                     java.util.Calendar cal = java.util.Calendar.getInstance();
                     cal.setTime(bookedEnd);

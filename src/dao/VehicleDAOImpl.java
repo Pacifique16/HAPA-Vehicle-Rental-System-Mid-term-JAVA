@@ -1,11 +1,15 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * HAPA Vehicle Rental System - Vehicle Data Access Object Implementation
+ * Implements all database operations related to vehicle management
+ * Provides concrete implementation of VehicleDAO interface methods
+ * Handles vehicle CRUD operations, search, availability checking, and status management
  */
 package dao;
 
 /**
+ * VehicleDAOImpl - Implementation of VehicleDAO interface
+ * Provides concrete database operations for vehicle management
+ * Handles vehicle CRUD operations, search functionality, and availability management
  *
  * @author Pacifique Harerimana
  */
@@ -15,8 +19,18 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Vehicle;
 
+/**
+ * Implementation class for vehicle database operations
+ * Provides concrete methods for vehicle management and availability checking
+ */
 public class VehicleDAOImpl implements VehicleDAO {
 
+    /**
+     * Retrieves all vehicles from the database
+     * Loads complete vehicle information including specifications and status
+     * 
+     * @return List of all vehicles in the system
+     */
     @Override
     public List<Vehicle> getAllVehicles() {
 
@@ -28,6 +42,7 @@ public class VehicleDAOImpl implements VehicleDAO {
              ResultSet rs = pst.executeQuery()) {
 
             while (rs.next()) {
+                // Create vehicle object from database record
                 Vehicle v = new Vehicle();
                 v.setId(rs.getInt("id"));
                 v.setPlateNumber(rs.getString("plate_number"));
@@ -50,10 +65,18 @@ public class VehicleDAOImpl implements VehicleDAO {
         return list;
     }
     
-    // In dao.BookingDAOImpl.java (Implementation)
-
+    /**
+     * Checks for duplicate booking by same customer for same vehicle and dates
+     * Prevents customers from booking the same vehicle multiple times for identical dates
+     * 
+     * @param customerId ID of the customer
+     * @param vehicleId ID of the vehicle
+     * @param startDate Start date of the booking
+     * @param endDate End date of the booking
+     * @return true if duplicate booking exists, false otherwise
+     */
     public boolean isDuplicateBooking(int customerId, int vehicleId, Date startDate, Date endDate) {
-        // SQL checks for an exact match by customer, vehicle, and dates, with a non-rejected status.
+        // SQL checks for exact match by customer, vehicle, and dates with active status
         String sql = "SELECT COUNT(*) FROM bookings "
                    + "WHERE customer_id = ? AND vehicle_id = ? "
                    + "AND start_date = ? AND end_date = ? "
@@ -62,6 +85,7 @@ public class VehicleDAOImpl implements VehicleDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pst = conn.prepareStatement(sql)) {
 
+            // Set query parameters
             pst.setInt(1, customerId);
             pst.setInt(2, vehicleId);
             pst.setDate(3, new java.sql.Date(startDate.getTime()));
@@ -78,13 +102,17 @@ public class VehicleDAOImpl implements VehicleDAO {
         return false;
     }
     
-    // In dao.BookingDAOImpl.java (Implementation)
-
+    /**
+     * Checks if vehicle is unavailable due to overlapping bookings
+     * Uses standard date overlap logic: (A.start <= B.end) AND (A.end >= B.start)
+     * 
+     * @param vehicleId ID of the vehicle to check
+     * @param startDate Requested start date
+     * @param endDate Requested end date
+     * @return true if vehicle is unavailable, false if available
+     */
     public boolean isVehicleUnavailable(int vehicleId, Date startDate, Date endDate) {
-        // Standard SQL date overlap check:
-        // (A.start <= B.end) AND (A.end >= B.start)
-        // The query checks if the existing booking's start date is before the new end date
-        // AND the existing booking's end date is after the new start date.
+        // Standard SQL date overlap check for conflicting bookings
         String sql = "SELECT COUNT(*) FROM bookings "
                    + "WHERE vehicle_id = ? AND status NOT IN ('REJECTED', 'CANCELLED') "
                    + "AND (start_date <= ? AND end_date >= ?)";
@@ -93,7 +121,7 @@ public class VehicleDAOImpl implements VehicleDAO {
              PreparedStatement pst = conn.prepareStatement(sql)) {
 
             pst.setInt(1, vehicleId);
-            // The dates from the form (new booking) are used for comparison
+            // Check for date overlaps with existing bookings
             pst.setDate(2, new java.sql.Date(endDate.getTime()));   // Compare to new END DATE
             pst.setDate(3, new java.sql.Date(startDate.getTime())); // Compare to new START DATE
 
@@ -108,6 +136,12 @@ public class VehicleDAOImpl implements VehicleDAO {
         return false;
     }
 
+    /**
+     * Counts total number of vehicles in the system
+     * Used for dashboard statistics and reporting
+     * 
+     * @return Total count of vehicles
+     */
     @Override
     public int countVehicles() {
         String sql = "SELECT COUNT(*) FROM vehicles";
@@ -230,6 +264,13 @@ public class VehicleDAOImpl implements VehicleDAO {
     }
 
     
+    /**
+     * Counts vehicles available for booking today
+     * Excludes vehicles in maintenance and those with active bookings
+     * Used for dashboard availability statistics
+     * 
+     * @return Count of vehicles available today
+     */
     @Override
     public int countAvailableToday() {
         String sql =
@@ -253,6 +294,14 @@ public class VehicleDAOImpl implements VehicleDAO {
         return 0;
     }
     
+    /**
+     * Updates vehicle status (Available, Rented, Maintenance)
+     * Used for managing vehicle availability and maintenance scheduling
+     * 
+     * @param vehicleId ID of the vehicle to update
+     * @param status New status to set
+     * @return true if status was successfully updated, false otherwise
+     */
     @Override
     public boolean updateVehicleStatus(int vehicleId, String status) {
         String sql = "UPDATE vehicles SET status = ? WHERE id = ?";
@@ -267,6 +316,13 @@ public class VehicleDAOImpl implements VehicleDAO {
         return false;
     }
     
+    /**
+     * Checks if vehicle is available for booking based on status
+     * Vehicles in maintenance are not available for booking
+     * 
+     * @param vehicleId ID of the vehicle to check
+     * @return true if vehicle is available for booking, false otherwise
+     */
     @Override
     public boolean isVehicleAvailableForBooking(int vehicleId) {
         String sql = "SELECT status FROM vehicles WHERE id = ?";

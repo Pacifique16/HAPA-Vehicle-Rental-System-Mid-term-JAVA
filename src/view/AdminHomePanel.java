@@ -1,11 +1,15 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * HAPA Vehicle Rental System - Admin Home Dashboard Panel
+ * Provides overview dashboard for administrators with key metrics and recent activity
+ * Features summary cards for statistics and today's bookings table
+ * Optimized for performance with single-query analytics and minimal database calls
  */
 package view;
 
 /**
+ * AdminHomePanel - Main dashboard interface for administrators
+ * Displays key system metrics and today's booking activity
+ * Features optimized analytics loading and interactive booking details
  *
  * @author Pacifique Harerimana
  */
@@ -30,35 +34,53 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 /**
- * Small dashboard: 4 summary cards and recent bookings quick table
+ * Admin dashboard panel with summary cards and recent bookings table
+ * Provides quick overview of system status and today's activity
  */
 public class AdminHomePanel extends JPanel {
 
-    private final VehicleDAO vehicleDAO = new VehicleDAOImpl(); // implement if missing
+    // DAO instances for database operations
+    private final VehicleDAO vehicleDAO = new VehicleDAOImpl();
     private final UserDAO userDAO = new UserDAOImpl();
     private final BookingDAO bookingDAO = new BookingDAOImpl();
 
-    private JLabel lblVehicles, lblUsers, lblRentals, lblAvailable;
+    // UI components for summary cards
+    private JLabel lblVehicles;        // Total vehicles count
+    private JLabel lblUsers;           // Total users count
+    private JLabel lblRentals;         // Total rentals count
+    private JLabel lblAvailable;       // Available vehicles today
+    
+    // Table for displaying today's bookings
     private JTable recentBookingsTable;
 
+    /**
+     * Constructor - Initializes the admin home dashboard
+     * Sets up summary cards and recent bookings table with data loading
+     */
     public AdminHomePanel() {
         setLayout(new BorderLayout(12,12));
         setBackground(Color.WHITE);
-        buildTopCards();
-        buildRecent();
-        loadAnalytics();
-        loadRecentBookings();
+        buildTopCards();        // Create summary statistics cards
+        buildRecent();          // Create recent bookings table
+        loadAnalytics();        // Load statistics data
+        loadRecentBookings();   // Load today's bookings
     }
 
+    /**
+     * Builds the top summary cards section
+     * Creates four cards showing key system statistics
+     */
     private void buildTopCards(){
         JPanel cards = new JPanel(new GridLayout(1,4,12,12));
         cards.setOpaque(false);
 
+        // Create summary cards with initial zero values
         lblVehicles = makeCard("Total Vehicles", "0");
         lblUsers = makeCard("Total Users", "0");
         lblRentals = makeCard("Total Rentals", "0");
         lblAvailable = makeCard("Available Today", "0");
 
+        // Wrap cards with borders and add to panel
         cards.add(wrapCard(lblVehicles));
         cards.add(wrapCard(lblUsers));
         cards.add(wrapCard(lblRentals));
@@ -67,6 +89,12 @@ public class AdminHomePanel extends JPanel {
         add(cards, BorderLayout.NORTH);
     }
 
+    /**
+     * Wraps a card label with proper styling and borders
+     * 
+     * @param center The label to wrap
+     * @return Styled panel containing the card
+     */
     private JPanel wrapCard(JLabel center){
         JPanel p = new JPanel(new BorderLayout());
         p.setBackground(Color.WHITE);
@@ -78,6 +106,13 @@ public class AdminHomePanel extends JPanel {
         return p;
     }
 
+    /**
+     * Creates a styled card label with title and value
+     * 
+     * @param title Card title text
+     * @param value Card value text
+     * @return Styled JLabel with HTML formatting
+     */
     private JLabel makeCard(String title, String value){
         JLabel l = new JLabel("<html><div style='text-align:center'><div style='font-size:18px;color:#222;'>"+value+"</div><div style='font-size:12px;color:#666;'>"+title+"</div></div></html>");
         l.setHorizontalAlignment(SwingConstants.CENTER);
@@ -85,21 +120,28 @@ public class AdminHomePanel extends JPanel {
         return l;
     }
 
+    /**
+     * Builds the recent bookings table section
+     * Creates table showing today's bookings with interactive features
+     */
     private void buildRecent(){
         JPanel p = new JPanel(new BorderLayout());
         p.setOpaque(false);
         p.setBorder(BorderFactory.createEmptyBorder(8,0,0,0));
+        
+        // Section header
         JLabel h = new JLabel("Today's Bookings");
         h.setFont(new Font("Segoe UI", Font.BOLD, 14));
         p.add(h, BorderLayout.NORTH);
 
+        // Create bookings table
         String[] columns = {"Customer", "Vehicle", "Pick-up", "Drop-off", "Status", "Total"};
         recentBookingsTable = new JTable(new javax.swing.table.DefaultTableModel(columns, 0));
         recentBookingsTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         recentBookingsTable.setRowHeight(25);
         recentBookingsTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         
-        // Add click listener for booking details
+        // Add double-click listener for booking details
         recentBookingsTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if (evt.getClickCount() == 2) {
@@ -108,7 +150,7 @@ public class AdminHomePanel extends JPanel {
             }
         });
         
-        // Custom renderer for status colors
+        // Apply custom renderer for status color coding
         recentBookingsTable.setDefaultRenderer(Object.class, new StatusTableRenderer());
         
         JScrollPane sp = new JScrollPane(recentBookingsTable);
@@ -117,9 +159,13 @@ public class AdminHomePanel extends JPanel {
         add(p, BorderLayout.CENTER);
     }
 
+    /**
+     * Loads analytics data for summary cards
+     * Uses optimized single query with subqueries for better performance
+     */
     private void loadAnalytics(){
         try {
-            // Single query to get all analytics data
+            // Optimized single query to get all analytics data at once
             String sql = "SELECT " +
                         "(SELECT COUNT(*) FROM vehicles) as total_vehicles, " +
                         "(SELECT COUNT(*) FROM users) as total_users, " +
@@ -134,11 +180,13 @@ public class AdminHomePanel extends JPanel {
                  ResultSet rs = pst.executeQuery()) {
                 
                 if (rs.next()) {
+                    // Extract analytics data
                     int totalVehicles = rs.getInt("total_vehicles");
                     int totalUsers = rs.getInt("total_users");
                     int totalRentals = rs.getInt("total_rentals");
                     int availableToday = rs.getInt("available_today");
                     
+                    // Update card labels with actual data
                     lblVehicles.setText("<html><div style='text-align:center'><div style='font-size:20px;color:#222;'>" + totalVehicles + "</div><div style='font-size:12px;color:#666;'>Total Vehicles</div></div></html>");
                     lblUsers.setText("<html><div style='text-align:center'><div style='font-size:20px;color:#222;'>" + totalUsers + "</div><div style='font-size:12px;color:#666;'>Total Users</div></div></html>");
                     lblRentals.setText("<html><div style='text-align:center'><div style='font-size:20px;color:#222;'>" + totalRentals + "</div><div style='font-size:12px;color:#666;'>Total Rentals</div></div></html>");
@@ -189,9 +237,14 @@ public class AdminHomePanel extends JPanel {
     
     // Removed auto-refresh to prevent unnecessary database calls
     
+    /**
+     * Shows detailed information for selected booking
+     * Triggered by double-clicking on a table row
+     */
     private void showBookingDetails() {
         int row = recentBookingsTable.getSelectedRow();
         if (row >= 0) {
+            // Extract booking information from selected row
             String customer = (String) recentBookingsTable.getValueAt(row, 0);
             String vehicle = (String) recentBookingsTable.getValueAt(row, 1);
             String pickupDate = recentBookingsTable.getValueAt(row, 2).toString();
@@ -199,6 +252,7 @@ public class AdminHomePanel extends JPanel {
             String status = (String) recentBookingsTable.getValueAt(row, 4);
             String total = (String) recentBookingsTable.getValueAt(row, 5);
             
+            // Format booking details for display
             String details = String.format(
                 "Booking Details:\n\n" +
                 "Customer: %s\n" +
@@ -210,19 +264,25 @@ public class AdminHomePanel extends JPanel {
                 customer, vehicle, pickupDate, dropoffDate, status, total
             );
             
+            // Show details in dialog
             JOptionPane.showMessageDialog(this, details, "Booking Details", JOptionPane.INFORMATION_MESSAGE);
         }
     }
     
-    // Custom renderer for status color coding
+    /**
+     * Custom table cell renderer for status color coding
+     * Applies different background colors based on booking status
+     */
     private class StatusTableRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             
-            if (column == 4 && value != null) { // Status column (now at index 4)
+            // Apply color coding to status column (index 4)
+            if (column == 4 && value != null) {
                 String status = value.toString();
                 if (!isSelected) {
+                    // Set background color based on booking status
                     switch (status.toUpperCase()) {
                         case "APPROVED":
                             c.setBackground(new Color(220, 255, 220)); // Light green

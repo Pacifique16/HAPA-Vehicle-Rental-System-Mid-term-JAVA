@@ -1,11 +1,15 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * HAPA Vehicle Rental System - User Data Access Object Implementation
+ * Implements all database operations related to user management
+ * Provides concrete implementation of UserDAO interface methods
+ * Handles user authentication, CRUD operations, and profile management
  */
 package dao;
 
 /**
+ * UserDAOImpl - Implementation of UserDAO interface
+ * Provides concrete database operations for user management
+ * Handles authentication, user CRUD operations, and status management
  *
  * @author Pacifique Harerimana
  */
@@ -17,8 +21,21 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation class for user database operations
+ * Provides concrete methods for user authentication and management
+ */
 public class UserDAOImpl implements UserDAO {
 
+    /**
+     * Authenticates user with username and password
+     * Checks credentials against database and validates account status
+     * Prevents login for inactive accounts
+     * 
+     * @param username User's username
+     * @param password User's password
+     * @return User object if authentication successful and account active, null otherwise
+     */
     @Override
     public User login(String username, String password) {
 
@@ -28,11 +45,13 @@ public class UserDAOImpl implements UserDAO {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
 
+            // Verify database connection
             if (con == null) {
                 System.out.println("Database connection is null!");
                 return null;
             }
 
+            // Set query parameters
             pst.setString(1, username);
             pst.setString(2, password);
             System.out.println("Executing query: " + sql);
@@ -41,6 +60,8 @@ public class UserDAOImpl implements UserDAO {
 
             if (rs.next()) {
                 System.out.println("User found in database!");
+                
+                // Create user object from database record
                 User u = new User();
                 u.setId(rs.getInt("id"));
                 u.setUsername(rs.getString("username"));
@@ -52,7 +73,7 @@ public class UserDAOImpl implements UserDAO {
                 u.setStatus(rs.getString("status"));
                 System.out.println("User role: " + u.getRole());
                 
-                // Check if user is active
+                // Verify account is active
                 if ("Inactive".equals(u.getStatus())) {
                     System.out.println("User account is inactive");
                     return null; // Prevent login for inactive users
@@ -68,72 +89,98 @@ public class UserDAOImpl implements UserDAO {
             e.printStackTrace();
         }
 
-        return null; // login failed
+        return null; // Authentication failed
     }
     
     
+    /**
+     * Adds a new user to the database
+     * Sets default status to "Active" if not specified
+     * 
+     * @param user User object containing user information
+     * @return true if user was successfully added, false otherwise
+     */
     @Override
-public boolean addUser(User user) {
-    String sql = "INSERT INTO users (username, password, full_name, phone, email, role, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    public boolean addUser(User user) {
+        String sql = "INSERT INTO users (username, password, full_name, phone, email, role, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    try (Connection con = DBConnection.getConnection();
-         PreparedStatement pst = con.prepareStatement(sql)) {
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
 
-        pst.setString(1, user.getUsername());
-        pst.setString(2, user.getPassword());
-        pst.setString(3, user.getFullName());
-        pst.setString(4, user.getPhone());
-        pst.setString(5, user.getEmail());
-        pst.setString(6, user.getRole());
-        pst.setString(7, user.getStatus() != null ? user.getStatus() : "Active");
+            // Set all user parameters
+            pst.setString(1, user.getUsername());
+            pst.setString(2, user.getPassword());
+            pst.setString(3, user.getFullName());
+            pst.setString(4, user.getPhone());
+            pst.setString(5, user.getEmail());
+            pst.setString(6, user.getRole());
+            pst.setString(7, user.getStatus() != null ? user.getStatus() : "Active");
 
-        return pst.executeUpdate() > 0;
+            return pst.executeUpdate() > 0;
 
-    } catch (Exception e) {
-        e.printStackTrace();
-        return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
 
-@Override
-public boolean updateUserProfile(User user) {
-    String sql = "UPDATE users SET full_name = ?, phone = ?, email = ? WHERE id = ?";
+    /**
+     * Updates user profile information (name, phone, email)
+     * Does not update username, password, role, or status
+     * 
+     * @param user User object with updated profile information
+     * @return true if profile was successfully updated, false otherwise
+     */
+    @Override
+    public boolean updateUserProfile(User user) {
+        String sql = "UPDATE users SET full_name = ?, phone = ?, email = ? WHERE id = ?";
 
-    try (Connection con = DBConnection.getConnection();
-         PreparedStatement pst = con.prepareStatement(sql)) {
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
 
-        pst.setString(1, user.getFullName());
-        pst.setString(2, user.getPhone());
-        pst.setString(3, user.getEmail());
-        pst.setInt(4, user.getId());
+            // Set profile update parameters
+            pst.setString(1, user.getFullName());
+            pst.setString(2, user.getPhone());
+            pst.setString(3, user.getEmail());
+            pst.setInt(4, user.getId());
 
-        return pst.executeUpdate() > 0;
+            return pst.executeUpdate() > 0;
 
-    } catch (Exception e) {
-        e.printStackTrace();
-        return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
 
 
-@Override
-public boolean changePassword(int id, String oldP, String newP) {
-    String sql = "UPDATE users SET password = ? WHERE id = ? AND password = ?";
+    /**
+     * Changes user password after verifying current password
+     * Requires old password verification for security
+     * 
+     * @param id User ID
+     * @param oldP Current password for verification
+     * @param newP New password to set
+     * @return true if password was successfully changed, false otherwise
+     */
+    @Override
+    public boolean changePassword(int id, String oldP, String newP) {
+        String sql = "UPDATE users SET password = ? WHERE id = ? AND password = ?";
 
-    try (Connection con = DBConnection.getConnection();
-         PreparedStatement pst = con.prepareStatement(sql)) {
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
 
-        pst.setString(1, newP);
-        pst.setInt(2, id);
-        pst.setString(3, oldP);
+            // Set password change parameters with verification
+            pst.setString(1, newP);  // New password
+            pst.setInt(2, id);       // User ID
+            pst.setString(3, oldP);  // Old password for verification
 
-        return pst.executeUpdate() > 0;
+            return pst.executeUpdate() > 0;
 
-    } catch (Exception e) {
-        e.printStackTrace();
-        return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
 
 
 @Override
@@ -255,6 +302,14 @@ public List<User> getAllUsers() {
         return null;
     }
     
+    /**
+     * Alternative authentication method (delegates to login)
+     * Provides additional authentication entry point
+     * 
+     * @param username User's username
+     * @param password User's password
+     * @return User object if authentication successful, null otherwise
+     */
     public User authenticateUser(String username, String password) {
         return login(username, password);
     }

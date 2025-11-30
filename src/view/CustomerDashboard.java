@@ -1,16 +1,21 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * HAPA Vehicle Rental System - Customer Dashboard
+ * Main interface for customers providing access to vehicle booking and account management
+ * Features navigation menu, dynamic content panels, and customer-specific functionality
+ * Supports vehicle browsing, booking management, and account settings
  */
 package view;
 
-
 /**
+ * CustomerDashboard - Main customer interface for the vehicle rental system
+ * Provides centralized access to customer functions including:
+ * - Vehicle browsing and booking
+ * - Personal booking history and management
+ * - Account settings and profile management
+ * - Booking status tracking and modifications
  *
  * @author Pacifique Harerimana
  */
-
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -20,49 +25,66 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import model.User;
 
-
-
 public class CustomerDashboard extends javax.swing.JFrame {
 
+    /** Currently logged in customer user */
     private User loggedInUser;
 
+    /**
+     * Constructor - Creates CustomerDashboard with user context
+     * Initializes the customer interface and loads default vehicle booking panel
+     * 
+     * @param user The customer user accessing the dashboard
+     */
     public CustomerDashboard(User user) {
+        // Set application icon
         setIconImage(new ImageIcon("images/logo.png").getImage());
-        initComponents();
-        this.loggedInUser = user;
-        this.setSize(1400, 700);
-        this.setLocationRelativeTo(null);
+        
+        initComponents();                           // Initialize UI components
+        this.loggedInUser = user;                   // Store user context
+        this.setSize(1400, 700);                    // Set optimal window size
+        this.setLocationRelativeTo(null);           // Center on screen
 
+        // Configure main content panel layout
         panelContent.setLayout(new java.awt.BorderLayout());
 
+        // Display vehicle booking panel by default
         showPage(new BookVehiclePanel(loggedInUser));
         
-        
-        imageLabel.setMaximumSize(null); // override the 0,0 limit
+        // Configure company logo display properties
+        imageLabel.setMaximumSize(null);            // Remove size constraints
         imageLabel.setPreferredSize(new java.awt.Dimension(120, 120));
         imageLabel.setMinimumSize(new java.awt.Dimension(120, 120));
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imageLabel.setVerticalAlignment(SwingConstants.CENTER);
 
-        // Load & scale logo into the label
+        // Load and scale company logo for display
         ImageIcon logo = new ImageIcon("images/logo.png");
         Image img = logo.getImage().getScaledInstance(120, 43, Image.SCALE_SMOOTH);
         imageLabel.setIcon(new ImageIcon(img));
-        // ----------------------------------------------------------
     }
 
 
+    /**
+     * Displays a panel in the main content area
+     * Replaces current content with the specified panel and refreshes display
+     * Uses SwingUtilities.invokeLater for thread-safe UI updates
+     * 
+     * @param page The panel to display in the content area
+     */
     private void showPage(javax.swing.JPanel page) {
-        panelContent.removeAll();
-        panelContent.setLayout(new BorderLayout());
-        panelContent.add(page, BorderLayout.CENTER);
+        panelContent.removeAll();                           // Clear existing content
+        panelContent.setLayout(new BorderLayout());         // Set layout manager
+        panelContent.add(page, BorderLayout.CENTER);        // Add new panel
 
+        // Perform UI updates on Event Dispatch Thread for thread safety
         SwingUtilities.invokeLater(() -> {
-            page.revalidate();
+            page.revalidate();                              // Refresh new panel
             page.repaint();
-            panelContent.revalidate();
+            panelContent.revalidate();                      // Refresh content container
             panelContent.repaint();
 
+            // Validate parent window if available
             java.awt.Window w = SwingUtilities.getWindowAncestor(panelContent);
             if (w != null) {
                 w.validate();
@@ -238,29 +260,52 @@ public class CustomerDashboard extends javax.swing.JFrame {
         setResizable(true);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Book Vehicle button click handler
+     * Displays the vehicle booking panel for browsing and booking available vehicles
+     * 
+     * @param evt Action event from button click
+     */
     private void btnBookVehicleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBookVehicleActionPerformed
-        // TODO add your handling code here:
         showPage(new BookVehiclePanel(loggedInUser));
     }//GEN-LAST:event_btnBookVehicleActionPerformed
 
+    /**
+     * My Bookings button click handler
+     * Displays the customer's booking history and management panel
+     * 
+     * @param evt Action event from button click
+     */
     private void btnMyBookingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMyBookingsActionPerformed
-        // TODO add your handling code here:
         showPage(new MyBookingsPanel(loggedInUser));
     }//GEN-LAST:event_btnMyBookingsActionPerformed
 
+    /**
+     * Settings button click handler
+     * Displays the customer account settings and profile management panel
+     * 
+     * @param evt Action event from button click
+     */
     private void btnSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSettingsActionPerformed
-        // TODO add your handling code here:
         showPage(new SettingsPanel(loggedInUser));
     }//GEN-LAST:event_btnSettingsActionPerformed
 
+    /**
+     * Logout button click handler
+     * Logs out the current customer and returns to login screen
+     * 
+     * @param evt Action event from button click
+     */
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-        // TODO add your handling code here:
-        new LoginForm().setVisible(true);
-        this.dispose();
+        new LoginForm().setVisible(true);    // Show login form
+        this.dispose();                      // Close customer dashboard
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     /**
-     * @param args the command line arguments
+     * Main method - Application entry point for customer dashboard
+     * Note: CustomerDashboard requires a User parameter, so this launches LoginForm instead
+     * 
+     * @param args Command line arguments (not used)
      */
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(() -> {
@@ -270,17 +315,18 @@ public class CustomerDashboard extends javax.swing.JFrame {
         });
     }
 
+    // UI Component Variables - Generated by NetBeans Form Editor
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnBookVehicle;
-    private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnMyBookings;
-    private javax.swing.JButton btnSettings;
-    private javax.swing.JLabel imageLabel;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JPanel panelContent;
-    private javax.swing.JPanel panelMenu;
-    private javax.swing.JPanel titlePanel;
+    private javax.swing.JButton btnBookVehicle;     // Navigation button for vehicle booking
+    private javax.swing.JButton btnLogout;          // Logout button
+    private javax.swing.JButton btnMyBookings;      // Navigation button for booking history
+    private javax.swing.JButton btnSettings;        // Navigation button for account settings
+    private javax.swing.JLabel imageLabel;          // Company logo display label
+    private javax.swing.JLabel jLabel1;             // Company name label
+    private javax.swing.JLabel jLabel2;             // Main title label
+    private javax.swing.JLabel jLabel3;             // Subtitle label
+    private javax.swing.JPanel panelContent;        // Main content area for dynamic panels
+    private javax.swing.JPanel panelMenu;           // Left navigation menu panel
+    private javax.swing.JPanel titlePanel;          // Top title banner panel
     // End of variables declaration//GEN-END:variables
 }

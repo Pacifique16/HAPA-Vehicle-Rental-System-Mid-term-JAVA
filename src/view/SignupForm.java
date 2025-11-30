@@ -1,11 +1,15 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * HAPA Vehicle Rental System - User Registration Form
+ * Provides user registration interface for new customers
+ * Features comprehensive validation, password strength checking, and placeholder text
+ * Includes duplicate prevention and proper error handling
  */
 package view;
 
 /**
+ * SignupForm - User registration interface for HAPA Vehicle Rental System
+ * Provides secure user registration with comprehensive validation
+ * Features password strength validation, phone number validation, and duplicate prevention
  *
  * @author Pacifique Harerimana
  */
@@ -19,13 +23,24 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import util.PasswordValidator;
 
-
+/**
+ * User registration form with comprehensive validation and security features
+ * Handles new customer account creation with proper input validation
+ */
 public class SignupForm extends javax.swing.JFrame {
 
     /**
      * Creates new form SignupForm
+     * Initializes the registration interface with placeholder text and logo
      */
     
+    /**
+     * Adds placeholder text functionality to text fields
+     * Shows gray placeholder text when field is empty, removes it when focused
+     * 
+     * @param field The text field to add placeholder to
+     * @param placeholder The placeholder text to display
+     */
     private void addPlaceholder(javax.swing.JTextField field, String placeholder) {
     field.setText(placeholder);
     field.setForeground(new java.awt.Color(153,153,153));
@@ -48,6 +63,14 @@ public class SignupForm extends javax.swing.JFrame {
     });
 }
 
+/**
+ * Adds placeholder text functionality to password fields
+ * Handles password masking properly - shows placeholder as plain text,
+ * switches to masked input when user starts typing
+ * 
+ * @param field The password field to add placeholder to
+ * @param placeholder The placeholder text to display
+ */
 private void addPlaceholderPassword(javax.swing.JPasswordField field, String placeholder) {
     field.setEchoChar((char) 0);
     field.setText(placeholder);
@@ -77,12 +100,17 @@ private void addPlaceholderPassword(javax.swing.JPasswordField field, String pla
 }
 
     
+    /**
+     * Constructor - Initializes the signup form
+     * Sets up UI components, loads logo, and configures placeholder text for all fields
+     */
     public SignupForm() {
         
+        // Set application icon
         setIconImage(new ImageIcon("images/logo.png").getImage());
         initComponents();
 
-
+        // Add placeholder text to all input fields for better user experience
         addPlaceholder(txtFullName, "Enter your full name");
         addPlaceholder(txtUsername, "Enter Username");
         addPlaceholder(txtPhone, "Enter Phone number");
@@ -90,18 +118,17 @@ private void addPlaceholderPassword(javax.swing.JPasswordField field, String pla
         addPlaceholderPassword(txtPassword, "Enter Password");
         addPlaceholderPassword(txtConfirmPassword, "Confirm Password");
         
-        
-        imageLabel.setMaximumSize(null); // override the 0,0 limit
+        // Configure company logo display
+        imageLabel.setMaximumSize(null); // override NetBeans constraints
         imageLabel.setPreferredSize(new java.awt.Dimension(120, 120));
         imageLabel.setMinimumSize(new java.awt.Dimension(120, 120));
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imageLabel.setVerticalAlignment(SwingConstants.CENTER);
 
-        // Load & scale logo into the label
+        // Load and scale company logo
         ImageIcon logo = new ImageIcon("images/logo.png");
         Image img = logo.getImage().getScaledInstance(120, 43, Image.SCALE_SMOOTH);
         imageLabel.setIcon(new ImageIcon(img));
-        // ----------------------------------------------------------
     }
 
 
@@ -225,31 +252,47 @@ private void addPlaceholderPassword(javax.swing.JPasswordField field, String pla
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Event handler for full name field action (Enter key pressed)
+     * Currently no specific action needed
+     */
     private void txtFullNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFullNameActionPerformed
-        // TODO add your handling code here:
+        // No action required - field is for input only
     }//GEN-LAST:event_txtFullNameActionPerformed
 
+    /**
+     * Event handler for email field action (Enter key pressed)
+     * Currently no specific action needed
+     */
     private void txtEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEmailActionPerformed
-        // TODO add your handling code here:
+        // No action required - field is for input only
     }//GEN-LAST:event_txtEmailActionPerformed
 
+    /**
+     * Event handler for login label click
+     * Navigates user back to the login form
+     */
     private void lblLoginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblLoginMouseClicked
-        // TODO add your handling code here:
+        // Navigate to login form and close signup form
         new LoginForm().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_lblLoginMouseClicked
 
+    /**
+     * Event handler for signup button click
+     * Performs comprehensive validation and creates new user account
+     * Includes password strength validation, phone number validation, and duplicate prevention
+     */
     private void btnSignupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignupActionPerformed
-        // TODO add your handling code here:
-   
-    String fullName = txtFullName.getText().trim();
-    String username = txtUsername.getText().trim();
-    String phone = txtPhone.getText().trim();
-    String email = txtEmail.getText().trim();
-    String password = new String(txtPassword.getPassword());
-    String confirm = new String(txtConfirmPassword.getPassword());
+        // Extract user input from form fields
+        String fullName = txtFullName.getText().trim();
+        String username = txtUsername.getText().trim();
+        String phone = txtPhone.getText().trim();
+        String email = txtEmail.getText().trim();
+        String password = new String(txtPassword.getPassword());
+        String confirm = new String(txtConfirmPassword.getPassword());
 
-    // Remove placeholder fake values
+    // Clear placeholder text if user didn't enter real values
     if (fullName.equals("Enter your full name")) fullName = "";
     if (username.equals("Enter Username")) username = "";
     if (phone.equals("Enter Phone number")) phone = "";
@@ -257,63 +300,79 @@ private void addPlaceholderPassword(javax.swing.JPasswordField field, String pla
     if (password.equals("Enter Password")) password = "";
     if (confirm.equals("Confirm Password")) confirm = "";
 
-    // BUSINESS VALIDATIONS
+    // Comprehensive input validation
+    
+    // Check that all required fields are filled
     if (fullName.isEmpty() || username.isEmpty() || phone.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
         JOptionPane.showMessageDialog(this, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
 
+    // Verify password confirmation matches
     if (!password.equals(confirm)) {
         JOptionPane.showMessageDialog(this, "Passwords do NOT match!", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
 
+    // Validate password strength using PasswordValidator utility
     if (!PasswordValidator.isValidPassword(password)) {
         JOptionPane.showMessageDialog(this, PasswordValidator.getPasswordRequirements(), "Invalid Password", JOptionPane.ERROR_MESSAGE);
         return;
     }
 
+    // Validate Rwandan phone number format (07xxxxxxxx)
     if (!phone.matches("07\\d{8}")) {
         JOptionPane.showMessageDialog(this, "Invalid Rwandan phone number!", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
 
+    // Basic email format validation
     if (!email.contains("@") || !email.contains(".")) {
         JOptionPane.showMessageDialog(this, "Invalid Email format!", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
 
-    // SAVE USER INTO DATABASE
+    // Create and save new user account
     User u = new User();
     u.setFullName(fullName);
     u.setUsername(username);
     u.setPhone(phone);
     u.setEmail(email);
     u.setPassword(password);
-    u.setRole("customer");
+    u.setRole("customer");  // All signups are customers by default
 
+    // Attempt to save user to database
     UserDAO dao = new UserDAOImpl();
     boolean success = dao.addUser(u);
 
     if (success) {
+        // Registration successful - redirect to login
         JOptionPane.showMessageDialog(this, "Account created successfully!");
         new LoginForm().setVisible(true);
         this.dispose();
     } else {
+        // Registration failed - likely duplicate username/email
         JOptionPane.showMessageDialog(this, "Failed to register! Username or Email already exists.", "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     }//GEN-LAST:event_btnSignupActionPerformed
 
+    /**
+     * Event handler for username field action (Enter key pressed)
+     * Currently no specific action needed
+     */
     private void txtUsernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsernameActionPerformed
-        // TODO add your handling code here:
+        // No action required - field is for input only
     }//GEN-LAST:event_txtUsernameActionPerformed
 
     /**
-     * @param args the command line arguments
+     * Main method - Application entry point for signup form
+     * Sets up look and feel and launches the registration form
+     * 
+     * @param args Command line arguments (not used)
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
+        /* Configure Nimbus look and feel for better UI appearance */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
@@ -336,7 +395,7 @@ private void addPlaceholderPassword(javax.swing.JPasswordField field, String pla
         }
         //</editor-fold>
 
-        /* Create and display the form */
+        /* Launch the signup form on the Event Dispatch Thread */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new SignupForm().setVisible(true);

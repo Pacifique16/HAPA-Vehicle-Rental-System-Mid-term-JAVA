@@ -1,12 +1,21 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * HAPA Vehicle Rental System - Login Form
+ * This is the main entry point for user authentication
+ * Supports both customer and staff login with role-based access control
+ * 
+ * Features:
+ * - Placeholder text for better UX
+ * - Logo display with proper scaling
+ * - Role-based authentication (Customer/Staff)
+ * - Input validation and error handling
+ * - Navigation to signup form
  */
 package view;
 
 /**
- *
+ * LoginForm - Main authentication interface for HAPA Vehicle Rental System
+ * Provides secure login functionality for both customers and staff members
+ * 
  * @author Pacifique Harerimana
  */
 
@@ -21,14 +30,23 @@ import javax.swing.SwingConstants;
 
 public class LoginForm extends javax.swing.JFrame {
 
+    // DAO instance for user authentication operations
     private UserDAO userDAO = new UserDAOImpl();
     
 
     
     /**
      * Creates new form LoginForm
+     * Initializes the login interface with proper styling and placeholder text
      */
     
+    /**
+     * Adds placeholder text functionality to text fields
+     * Shows gray placeholder text when field is empty, removes it when focused
+     * 
+     * @param field The text field to add placeholder to
+     * @param placeholder The placeholder text to display
+     */
     private void addPlaceholder(javax.swing.JTextField field, String placeholder) {
     field.setText(placeholder);
     field.setForeground(new java.awt.Color(153,153,153));
@@ -53,6 +71,14 @@ public class LoginForm extends javax.swing.JFrame {
 }
 
     
+    /**
+     * Adds placeholder text functionality to password fields
+     * Handles password masking properly - shows placeholder as plain text,
+     * switches to masked input when user starts typing
+     * 
+     * @param field The password field to add placeholder to
+     * @param placeholder The placeholder text to display
+     */
     private void addPlaceholderPassword(javax.swing.JPasswordField field, String placeholder) {
     field.setEchoChar((char) 0); // show text normally when placeholder
     field.setText(placeholder);
@@ -82,26 +108,29 @@ public class LoginForm extends javax.swing.JFrame {
 }
 
     
-    
-    
+    /**
+     * Constructor - Initializes the login form
+     * Sets up the UI components, loads logo, and configures placeholder text
+     */
     public LoginForm() {
         initComponents();
 
         setIconImage(new ImageIcon("images/logo.png").getImage());
 
-        // ---- FIX IMAGE LABEL (override auto-generated values) ----
+        // Configure image label properties (override NetBeans auto-generated constraints)
         imageLabel.setMaximumSize(null); // override the 0,0 limit
         imageLabel.setPreferredSize(new java.awt.Dimension(120, 120));
         imageLabel.setMinimumSize(new java.awt.Dimension(120, 120));
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imageLabel.setVerticalAlignment(SwingConstants.CENTER);
 
-        // Load & scale logo into the label
+        // Load company logo and scale it to fit the label dimensions
         ImageIcon logo = new ImageIcon("images/logo.png");
         Image img = logo.getImage().getScaledInstance(120, 43, Image.SCALE_SMOOTH);
         imageLabel.setIcon(new ImageIcon(img));
-        // ----------------------------------------------------------
+        // End of image configuration
 
+        // Add placeholder text to input fields for better user experience
         addPlaceholder(txtUsername, "   Enter Username");
         addPlaceholderPassword(txtPassword, "    Enter Password");
     }
@@ -245,41 +274,50 @@ public class LoginForm extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Event handler for staff checkbox
+     * Currently no specific action needed when checkbox state changes
+     */
     private void chkStaffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkStaffActionPerformed
-        // TODO add your handling code here:
+        // No action required - checkbox state is checked during login
     }//GEN-LAST:event_chkStaffActionPerformed
 
+    /**
+     * Event handler for login button click
+     * Performs user authentication and role-based navigation
+     * Validates input, authenticates user, and redirects to appropriate dashboard
+     */
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        // TODO add your handling code here:
-        
+        // Extract user input from form fields
         String username = txtUsername.getText().trim();
         String password = new String(txtPassword.getPassword());
         boolean isStaff = chkStaff.isSelected();
         
-        // Remove placeholder fake values
+        // Clear placeholder text if user didn't enter real values
         if (username.equals("   Enter Username")) username = "";
         if (password.equals("    Enter Password")) password = "";
         
+        // Validate that both username and password are provided
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
-        // Authenticate user
+        // Attempt to authenticate user with provided credentials
         User user = userDAO.login(username, password);
         
         if (user != null) {
-            // Check role match
+            // User exists - now verify role matches the selected option
             if (isStaff && user.getRole().equals("admin")) {
-                // Staff login successful
+                // Staff member logging in - redirect to admin dashboard
                 new AdminDashboard(user).setVisible(true);
                 this.dispose();
             } else if (!isStaff && user.getRole().equals("customer")) {
-                // Customer login successful
+                // Customer logging in - redirect to customer dashboard
                 new CustomerDashboard(user).setVisible(true);
                 this.dispose();
             } else {
-                // Role mismatch - provide specific message
+                // Role mismatch - user exists but selected wrong role
                 if (isStaff && user.getRole().equals("customer")) {
                     JOptionPane.showMessageDialog(this, "You're not registered as staff", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
@@ -287,21 +325,29 @@ public class LoginForm extends javax.swing.JFrame {
                 }
             }
         } else {
+            // Authentication failed - invalid credentials
             JOptionPane.showMessageDialog(this, "Invalid username or password!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnLoginActionPerformed
 
+    /**
+     * Event handler for signup label click
+     * Navigates user to the registration form
+     */
     private void lblSignupMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSignupMouseClicked
-        // TODO add your handling code here:
+        // Open signup form and close current login form
         new SignupForm().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_lblSignupMouseClicked
 
     /**
-     * @param args the command line arguments
+     * Main method - Application entry point
+     * Sets up the look and feel and launches the login form
+     * 
+     * @param args Command line arguments (not used)
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
+        /* Configure Nimbus look and feel for better UI appearance */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
@@ -324,7 +370,7 @@ public class LoginForm extends javax.swing.JFrame {
         }
         //</editor-fold>
 
-        /* Create and display the form */
+        /* Launch the login form on the Event Dispatch Thread */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new LoginForm().setVisible(true);

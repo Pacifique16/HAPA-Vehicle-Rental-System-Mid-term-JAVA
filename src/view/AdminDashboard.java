@@ -1,7 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * HAPA Vehicle Rental System - Administrator Dashboard
+ * Main interface for system administrators providing access to all management functions
+ * Features navigation menu, dynamic content panels, and comprehensive admin tools
+ * Supports vehicle management, user management, booking approvals, and reporting
  */
 package view;
 
@@ -10,49 +11,72 @@ import javax.swing.ImageIcon;
 import model.User;
 
 /**
+ * AdminDashboard - Main administrative interface for the vehicle rental system
+ * Provides centralized access to all administrative functions including:
+ * - Dashboard overview with key metrics
+ * - Vehicle fleet management
+ * - User account management
+ * - Booking approval workflow
+ * - System reports and analytics
+ * - Administrative settings
  *
  * @author Pacifique Harerimana
  */
 public class AdminDashboard extends javax.swing.JFrame {
     
     
+    /** Currently logged in administrator user */
     private User loggedInUser;
 
     /**
-     * Creates new form AdminDashboard
+     * Default constructor - Creates new AdminDashboard without user context
+     * Delegates to parameterized constructor with null user
      */
     public AdminDashboard() {
         this(null); // Call the parameterized constructor with null
     }
     
+    /**
+     * Parameterized constructor - Creates AdminDashboard with user context
+     * Initializes the dashboard interface and loads default home panel
+     * 
+     * @param user The administrator user accessing the dashboard
+     */
     public AdminDashboard(User user) {
         initComponents();
-        this.setSize(1400, 700);
-        this.setLocationRelativeTo(null);
-        this.loggedInUser = user;
+        this.setSize(1400, 700);                    // Set optimal window size
+        this.setLocationRelativeTo(null);           // Center on screen
+        this.loggedInUser = user;                   // Store user context
         
+        // Set application icon
         setIconImage(new ImageIcon("images/logo.png").getImage());   
         
-                // Load & scale logo into the label
+        // Load and scale company logo for display
         ImageIcon logo = new ImageIcon("images/logo.png");
         Image img = logo.getImage().getScaledInstance(120, 43, Image.SCALE_SMOOTH);
         imageLabel.setIcon(new ImageIcon(img));
-        // ----------------------------------------------------------
         
-        // Show dashboard by default
+        // Display dashboard home panel by default
         showPage(new AdminHomePanel());
     }
 
+    /**
+     * Displays a panel in the main content area
+     * Replaces current content with the specified panel and refreshes display
+     * 
+     * @param page The panel to display in the content area
+     */
     private void showPage(javax.swing.JPanel page) {
-    panelContent.removeAll();
-    panelContent.setLayout(new java.awt.BorderLayout());
-    panelContent.add(page, java.awt.BorderLayout.CENTER);
+        panelContent.removeAll();                                    // Clear existing content
+        panelContent.setLayout(new java.awt.BorderLayout());        // Set layout manager
+        panelContent.add(page, java.awt.BorderLayout.CENTER);       // Add new panel
 
-    page.revalidate();
-    page.repaint();
-    panelContent.revalidate();
-    panelContent.repaint();
-}
+        // Refresh display to show new content
+        page.revalidate();
+        page.repaint();
+        panelContent.revalidate();
+        panelContent.repaint();
+    }
 
     
     /**
@@ -250,42 +274,82 @@ public class AdminDashboard extends javax.swing.JFrame {
         setResizable(true);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Dashboard button click handler
+     * Displays the admin home panel with system overview and metrics
+     * 
+     * @param evt Action event from button click
+     */
     private void btnDashboardActionPerformed(java.awt.event.ActionEvent evt) {
         showPage(new AdminHomePanel());
     }
 
+    /**
+     * Manage Vehicle button click handler
+     * Displays the vehicle management panel for fleet administration
+     * 
+     * @param evt Action event from button click
+     */
     private void btnManageVehicleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageVehicleActionPerformed
-        // TODO add your handling code here:
         showPage(new ManageVehiclesPanel());
     }//GEN-LAST:event_btnManageVehicleActionPerformed
 
+    /**
+     * Manage Users button click handler
+     * Displays the user management panel for customer and admin account administration
+     * 
+     * @param evt Action event from button click
+     */
     private void btnManageUsersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageUsersActionPerformed
-        // TODO add your handling code here:
          showPage(new ManageUsersPanel());
     }//GEN-LAST:event_btnManageUsersActionPerformed
 
+    /**
+     * Logout button click handler
+     * Logs out the current administrator and returns to login screen
+     * 
+     * @param evt Action event from button click
+     */
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-        // TODO add your handling code here:
-        new LoginForm().setVisible(true);
-        this.dispose();
+        new LoginForm().setVisible(true);    // Show login form
+        this.dispose();                      // Close admin dashboard
     }//GEN-LAST:event_btnLogoutActionPerformed
 
+    /**
+     * Settings button click handler
+     * Displays the settings panel for administrator account management
+     * 
+     * @param evt Action event from button click
+     */
     private void btnSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSettingsActionPerformed
-       
         showPage(new SettingsPanel(loggedInUser));
     }//GEN-LAST:event_btnSettingsActionPerformed
 
+    /**
+     * Bookings Approval button click handler
+     * Displays the booking approval panel for managing customer booking requests
+     * 
+     * @param evt Action event from button click
+     */
     private void btnBookingsApprovalActionPerformed(java.awt.event.ActionEvent evt) {
         showPage(new BookingsApprovalPanel());
     }
 
+    /**
+     * Reports button click handler
+     * Displays the reports panel for system analytics and business intelligence
+     * 
+     * @param evt Action event from button click
+     */
     private void btnReportsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportsActionPerformed
-        // TODO add your handling code here:
         showPage(new AdminReportsPanel());
     }//GEN-LAST:event_btnReportsActionPerformed
 
     /**
-     * @param args the command line arguments
+     * Main method - Application entry point for admin dashboard
+     * Sets up look and feel and launches the dashboard interface
+     * 
+     * @param args Command line arguments (not used)
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -312,7 +376,7 @@ public class AdminDashboard extends javax.swing.JFrame {
         //</editor-fold>
         //</editor-fold>
 
-        /* Create and display the form */
+        /* Create and display the admin dashboard */
         java.awt.EventQueue.invokeLater(() -> {
             new AdminDashboard().setVisible(true);
         });
@@ -320,20 +384,21 @@ public class AdminDashboard extends javax.swing.JFrame {
     
 
 
+    // UI Component Variables - Generated by NetBeans Form Editor
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnBookingsApproval;
-    private javax.swing.JButton btnDashboard;
-    private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnManageUsers;
-    private javax.swing.JButton btnManageVehicle;
-    private javax.swing.JButton btnReports;
-    private javax.swing.JButton btnSettings;
-    private javax.swing.JLabel imageLabel;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JPanel panelContent;
-    private javax.swing.JPanel panelMenu;
-    private javax.swing.JPanel titlePanel;
+    private javax.swing.JButton btnBookingsApproval;    // Navigation button for booking approvals
+    private javax.swing.JButton btnDashboard;           // Navigation button for dashboard home
+    private javax.swing.JButton btnLogout;              // Logout button
+    private javax.swing.JButton btnManageUsers;         // Navigation button for user management
+    private javax.swing.JButton btnManageVehicle;       // Navigation button for vehicle management
+    private javax.swing.JButton btnReports;             // Navigation button for reports
+    private javax.swing.JButton btnSettings;            // Navigation button for settings
+    private javax.swing.JLabel imageLabel;              // Company logo display label
+    private javax.swing.JLabel jLabel1;                 // Company name label
+    private javax.swing.JLabel jLabel2;                 // Main title label
+    private javax.swing.JLabel jLabel3;                 // Subtitle label
+    private javax.swing.JPanel panelContent;            // Main content area for dynamic panels
+    private javax.swing.JPanel panelMenu;               // Left navigation menu panel
+    private javax.swing.JPanel titlePanel;              // Top title banner panel
     // End of variables declaration//GEN-END:variables
 }

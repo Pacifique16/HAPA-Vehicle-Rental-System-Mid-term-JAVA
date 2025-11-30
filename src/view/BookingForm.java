@@ -1,16 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * HAPA Vehicle Rental System - Vehicle Booking Form
+ * Provides a modern, card-style interface for customers to book vehicles
+ * Features comprehensive validation, cost calculation, and availability checking
+ * Includes duplicate booking prevention and informative error messages
  */
 package view;
 
-
 /**
+ * BookingForm - Modal dialog for vehicle booking
+ * Provides an intuitive interface for customers to select dates and confirm bookings
+ * Features real-time cost calculation, validation, and availability checking
  *
  * @author Pacifique Harerimana
  */
-
 
 import dao.BookingDAO;
 import dao.BookingDAOImpl;
@@ -23,25 +25,40 @@ import java.awt.*;
 import java.util.Date;
 
 /**
- * Modern card-style booking form.
- * Usage:
- *   new BookingForm(loggedInUser, vehicle).setVisible(true);
+ * Modern card-style booking form dialog
+ * Allows customers to select dates and book vehicles with comprehensive validation
+ * Usage: new BookingForm(loggedInUser, vehicle).setVisible(true);
  */
 public class BookingForm extends JDialog {
 
-    private final Vehicle vehicle;
-    private final User user;
+    // Core data objects
+    private final Vehicle vehicle;    // Vehicle being booked
+    private final User user;          // Customer making the booking
 
-    private JLabel lblImage;
-    private JLabel lblModel;
-    private JLabel lblPrice;
-    private JSpinner spStart;
-    private JSpinner spEnd;
-    private JLabel lblDays;
-    private JLabel lblTotal;
-    private JButton btnConfirm;
-    private JButton btnCancel;
+    // UI Components for vehicle display
+    private JLabel lblImage;          // Vehicle image display
+    private JLabel lblModel;          // Vehicle model name
+    private JLabel lblPrice;          // Price per day display
+    
+    // Date selection components
+    private JSpinner spStart;         // Start date picker
+    private JSpinner spEnd;           // End date picker
+    
+    // Calculation display components
+    private JLabel lblDays;           // Number of rental days
+    private JLabel lblTotal;          // Total cost display
+    
+    // Action buttons
+    private JButton btnConfirm;       // Confirm booking button
+    private JButton btnCancel;        // Cancel booking button
 
+    /**
+     * Constructor - Creates a new booking form dialog
+     * Initializes the form with user and vehicle information
+     * 
+     * @param user The customer making the booking
+     * @param vehicle The vehicle to be booked
+     */
     public BookingForm(User user, Vehicle vehicle) {
         super((Frame) null, "Book Vehicle", true);
         this.vehicle = vehicle;
@@ -53,12 +70,16 @@ public class BookingForm extends JDialog {
         setLocationRelativeTo(null);
     }
 
+    /**
+     * Initializes all UI components and layouts
+     * Creates a modern card-style interface with proper styling
+     */
     private void initComponents() {
-        // Root panel — dim background effect already handled by JDialog modality
+        // Root panel with light background
         JPanel root = new JPanel(new GridBagLayout());
         root.setBackground(new Color(245, 247, 250));
 
-        // Card panel (white, rounded-ish via border)
+        // Main card panel with white background and border
         JPanel card = new JPanel();
         card.setBackground(Color.WHITE);
         card.setLayout(new BorderLayout());
@@ -68,7 +89,7 @@ public class BookingForm extends JDialog {
         ));
         card.setPreferredSize(new Dimension(420, 430));
 
-        // Top: Image
+        // Top section: Vehicle image
         lblImage = new JLabel();
         lblImage.setHorizontalAlignment(SwingConstants.CENTER);
         lblImage.setPreferredSize(new Dimension(220, 140));
@@ -76,7 +97,7 @@ public class BookingForm extends JDialog {
 
         card.add(lblImage, BorderLayout.NORTH);
 
-        // Center: info + date pickers
+        // Center section: Vehicle info and date selection
         JPanel center = new JPanel();
         center.setBackground(Color.WHITE);
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
@@ -96,14 +117,14 @@ public class BookingForm extends JDialog {
         center.add(lblPrice);
         center.add(Box.createVerticalStrut(2));
 
-        // Dates panel (side-by-side)
+        // Date selection panel with side-by-side layout
         JPanel dates = new JPanel(new GridBagLayout());
         dates.setBackground(Color.WHITE);
         GridBagConstraints d = new GridBagConstraints();
         d.insets = new Insets(4, 4, 4, 4);
         d.fill = GridBagConstraints.HORIZONTAL;
 
-        // Start
+        // Start date selection
         d.gridx = 0;
         d.gridy = 0;
         dates.add(new JLabel("Start Date"), d);
@@ -114,7 +135,7 @@ public class BookingForm extends JDialog {
         d.gridy = 1;
         dates.add(spStart, d);
 
-        // End
+        // End date selection
         d.gridx = 1;
         d.gridy = 0;
         dates.add(new JLabel("End Date"), d);
@@ -128,7 +149,7 @@ public class BookingForm extends JDialog {
         center.add(dates);
         center.add(Box.createVerticalStrut(2));
 
-        // Calculated info
+        // Calculated rental information display
         lblDays = new JLabel("Days: 1");
         lblDays.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         lblDays.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -144,7 +165,7 @@ public class BookingForm extends JDialog {
 
         card.add(center, BorderLayout.CENTER);
 
-        // Bottom: buttons
+        // Bottom section: Action buttons
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 8));
         bottom.setBackground(Color.WHITE);
 
@@ -162,47 +183,61 @@ public class BookingForm extends JDialog {
 
         card.add(bottom, BorderLayout.SOUTH);
 
-        // Add listeners
-        spStart.addChangeListener(e -> recalc());
-        spEnd.addChangeListener(e -> recalc());
+        // Add event listeners for real-time updates and actions
+        spStart.addChangeListener(e -> recalc());  // Recalculate when start date changes
+        spEnd.addChangeListener(e -> recalc());    // Recalculate when end date changes
 
-        btnConfirm.addActionListener(e -> onConfirm());
-        btnCancel.addActionListener(e -> dispose());
+        btnConfirm.addActionListener(e -> onConfirm());  // Handle booking confirmation
+        btnCancel.addActionListener(e -> dispose());     // Close dialog on cancel
 
         // Put card into center of root
         root.add(card);
 
         setContentPane(root);
 
-        // initial calculation
+        // Perform initial cost calculation
         recalc();
     }
 
+    /**
+     * Sets the vehicle image in the display label
+     * Falls back to vehicle model text if image cannot be loaded
+     */
     private void setVehicleImage() {
         try {
+            // Load and scale vehicle image
             ImageIcon ic = new ImageIcon(vehicle.getImagePath());
             Image img = ic.getImage().getScaledInstance(200, 130, Image.SCALE_SMOOTH);
             lblImage.setIcon(new ImageIcon(img));
         } catch (Exception ex) {
+            // Fallback to text display if image fails to load
             lblImage.setText(vehicle.getModel());
         }
     }
 
+    /**
+     * Recalculates rental days and total cost based on selected dates
+     * Updates the display labels with calculated values
+     * Handles edge cases and calculation errors gracefully
+     */
     private void recalc() {
         try {
             Date s = (Date) spStart.getValue();
             Date e = (Date) spEnd.getValue();
 
-            // normalize (zero time part) by using days difference via milliseconds
+            // Calculate days difference (normalize time component)
             long dif = e.getTime() - s.getTime();
             long days = dif / (1000L * 60 * 60 * 24) + 1;
-            if (days <= 0) days = 1;
+            if (days <= 0) days = 1;  // Minimum 1 day rental
 
+            // Calculate total cost
             double total = days * vehicle.getPricePerDay();
 
+            // Update display labels
             lblDays.setText("Days: " + days);
             lblTotal.setText("Total: " + String.format("%,.0f RWF", total));
         } catch (Exception ex) {
+            // Handle calculation errors gracefully
             lblDays.setText("Days: ?");
             lblTotal.setText("Total: ?");
         }
