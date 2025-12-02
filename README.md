@@ -204,17 +204,3 @@ HAPA_Vehicle_Rental_System/
 This project is developed for educational purposes as part of a university assignment.
 
 ---
-
-## 🎯 Project Evaluation Compliance
-
-This project meets all requirements for the Mid-Semester Project:
-
-✅ **Database**: PostgreSQL with 4+ tables, 5+ attributes each  
-✅ **Validations**: 7 technical + 8 business validation rules  
-✅ **Design Patterns**: MVC, DAO, Singleton implementation  
-✅ **CRUD Operations**: Complete with JDBC and JTable display  
-✅ **GUI**: 12+ Swing pages with effective communication  
-✅ **User Feedback**: JOptionPane messages throughout  
-✅ **Real-world Problem**: Vehicle rental management solution  
-
-**Expected Score**: 28-30/30 marks
