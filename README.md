@@ -197,7 +197,7 @@ HAPA_Vehicle_Rental_System/
 
 **Pacifique Harerimana**
 - Student Project - Mid-Semester Assignment
-- Java Application Development Course
+- Java Programming Course
 
 ## 📄 License
 
