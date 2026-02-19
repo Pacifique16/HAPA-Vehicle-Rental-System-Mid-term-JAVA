@@ -198,7 +198,8 @@ HAPA_Vehicle_Rental_System/
 **Pacifique Harerimana**
 - Student Project - Mid-Semester Assignment
 - Java Programming Course
-📧 Contact: [GitHub](https://github.com/Pacifique16)
+
+ 📧 Contact: [GitHub](https://github.com/Pacifique16)
 
 ## 📝 License
 
