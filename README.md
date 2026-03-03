@@ -2,6 +2,8 @@
 
 A comprehensive Java-based desktop application for managing vehicle rentals with separate interfaces for customers and administrators.
 
+<img width="545" height="605" alt="login" src="https://github.com/user-attachments/assets/da287dfc-1f3f-403e-a02e-38ae4481f4f3" />
+
 ## 🚗 Project Overview
 
 **HAPA Vehicle Rental System** is a real-world problem-solving application that addresses vehicle rental management challenges. The system provides a complete solution for vehicle booking, user management, and rental administration using modern software design patterns.
