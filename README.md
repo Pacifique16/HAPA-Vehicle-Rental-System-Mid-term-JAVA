@@ -199,8 +199,22 @@ HAPA_Vehicle_Rental_System/
 - Student Project - Mid-Semester Assignment
 - Java Programming Course
 
-## 📄 License
+ 📧 Contact: [GitHub](https://github.com/Pacifique16)
 
-This project is developed for educational purposes as part of a university assignment.
+## 📝 License
 
----
+© Copyright 2025 Pacifique Harerimana
+
+This project is for educational purposes as part of AUCA Java Programming coursework. Feel free to fork and learn from it, but please give credit where it's due.
+
+
+
+## ⭐ Show Your Support
+
+**If you found this project helpful or interesting, please consider giving it a star!** 🌟
+
+Your support motivates me to create more educational projects and helps others discover useful resources.
+
+
+##
+*Built with ❤️ for learning and sharing knowledge*
